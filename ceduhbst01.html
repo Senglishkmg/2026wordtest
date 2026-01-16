@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>어휘끝 고교기본 문장제 시험</title>
+    <style>
+        :root { --main-purple: #5c5cf4; --bg-gray: #f0f2f5; --error-red: #ff4d4d; --success-green: #2ecc71; }
+        body { font-family: 'Apple SD Gothic Neo', sans-serif; background-color: var(--bg-gray); margin: 0; display: flex; justify-content: center; padding: 20px; }
+        .container { background: white; width: 100%; max-width: 500px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); padding: 30px; box-sizing: border-box; text-align: center; }
+        
+        .btn { width: 100%; border: none; border-radius: 12px; padding: 16px; font-size: 16px; font-weight: 700; cursor: pointer; color: white; margin-bottom: 12px; transition: 0.2s; }
+        .btn-purple { background-color: var(--main-purple); }
+        .btn-gray { background-color: #636e72; }
+
+        .screen { display: none; } .active { display: block; }
+        
+        input[type="text"] { width: 100%; padding: 15px; border: 2px solid #e0e0e0; border-radius: 12px; font-size: 17px; box-sizing: border-box; outline: none; }
+
+        .header { display: flex; justify-content: space-between; font-weight: 800; margin-bottom: 25px; font-size: 18px; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px; }
+        .card { background: #f8f9fa; border-radius: 18px; padding: 30px; margin-bottom: 25px; line-height: 1.6; text-align: left; }
+        .en { font-size: 20px; margin-bottom: 12px; color: #2d3436; font-weight: 500; }
+        .ko-hint { font-size: 16px; color: var(--main-purple); font-weight: 600; }
+        .blank { color: var(--main-purple); font-weight: 800; text-decoration: underline; }
+
+        .wrong-list { max-height: 350px; overflow-y: auto; text-align: left; border: 1px solid #eee; padding: 15px; border-radius: 12px; margin-bottom: 25px; background: #fff; }
+        .wrong-item { border-bottom: 1px solid #f0f0f0; padding: 15px 0; font-size: 14px; }
+        .correct-ans { color: #0984e3; font-weight: 700; }
+        .wrong-ans { color: var(--error-red); font-weight: 700; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id="quiz-screen" class="screen">
+        <div class="header">
+            <span id="unit-name">Quiz</span>
+            <span id="progress">0 / 0</span>
+        </div>
+        <div class="card">
+            <div class="en" id="en-text"></div>
+            <div class="ko-hint" id="ko-text"></div>
+        </div>
+        <input type="text" id="user-input" placeholder="정답을 입력하세요..." autocomplete="off">
+        <button class="btn btn-purple" style="margin-top:10px;" onclick="handleNext()">제출</button>
+    </div>
+
+    <div id="result-screen" class="screen">
+        <h2 style="font-size:24px; font-weight:800; margin-top:0;">퀴즈 결과</h2>
+        <div id="res-student" style="font-weight:700; font-size:18px; margin-bottom:10px;"></div>
+        <div id="final-score" style="color:var(--main-purple); font-weight:800; font-size:20px; margin-bottom:25px;"></div>
+        <div style="text-align:left; font-weight:800; margin-bottom:10px;">틀린 문제 내역</div>
+        <div class="wrong-list" id="wrong-list"></div>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+            <button class="btn btn-purple" onclick="downloadResult()">결과 저장</button>
+            <button class="btn btn-gray" onclick="location.href='cedusatst.html'">돌아가기</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    /* 데이터부: AI Studio 생성 데이터 삽입 */
+    const quizData = {
+  "어휘끝 고교기본 18": [
+    {
+      "sentence": "It is difficult to compare these two smartphones.",
+      "ko": "이 두 스마트폰을 비교하는 것은 어렵다.",
+      "word": "compare"
+    },
+    {
+      "sentence": "Poets often compare life to a journey.",
+      "ko": "시인들은 종종 인생을 여행에 비유한다.",
+      "word": "compare"
+    },
+    {
+      "sentence": "We should divide the cake into eight pieces.",
+      "ko": "우리는 케이크를 여덟 조각으로 나누어야 한다.",
+      "word": "divide"
+    },
+    {
+      "sentence": "The path divides into two at the river.",
+      "ko": "강가에서 길이 둘로 갈라진다.",
+      "word": "divides"
+    },
+    {
+      "sentence": "I can't relate these two events to each other.",
+      "ko": "나는 이 두 사건을 서로 관련시킬 수 없다.",
+      "word": "relate"
+    },
+    {
+      "sentence": "The results relate to how much you practiced.",
+      "ko": "그 결과는 당신이 얼마나 많이 연습했는지와 관련이 있다.",
+      "word": "relate"
+    },
+    {
+      "sentence": "He decided to leave the company next month.",
+      "ko": "그는 다음 달에 회사를 떠나기로 결정했다.",
+      "word": "leave"
+    },
+    {
+      "sentence": "Don't leave your umbrella in the taxi.",
+      "ko": "택시에 우산을 남겨 두지 마세요.",
+      "word": "leave"
+    },
+    {
+      "sentence": "Just follow me and you won't get lost.",
+      "ko": "그냥 저를 따라오시면 길을 잃지 않을 것입니다.",
+      "word": "follow"
+    },
+    {
+      "sentence": "You must follow the safety instructions.",
+      "ko": "당신은 안전 지침을 따라야 합니다.",
+      "word": "follow"
+    },
+    {
+      "sentence": "I'm sorry, I don't follow your logic.",
+      "ko": "죄송합니다만, 당신의 논리를 이해하지 못하겠습니다.",
+      "word": "follow"
+    },
+    {
+      "sentence": "She had to endure the pain for a long time.",
+      "ko": "그녀는 오랫동안 고통을 견뎌야 했다.",
+      "word": "endure"
+    },
+    {
+      "sentence": "Their friendship will endure forever.",
+      "ko": "그들의 우정은 영원히 지속될 것이다.",
+      "word": "endure"
+    },
+    {
+      "sentence": "The law forbids smoking in public places.",
+      "ko": "법은 공공장소에서의 흡연을 금지한다.",
+      "word": "forbids"
+    },
+    {
+      "sentence": "It's hard to control the crowd at the concert.",
+      "ko": "콘서트장에서 군중을 통제하는 것은 어렵다.",
+      "word": "control"
+    },
+    {
+      "sentence": "No one can control my life but me.",
+      "ko": "나 말고는 누구도 내 인생을 지배할 수 없다.",
+      "word": "control"
+    },
+    {
+      "sentence": "You can control the volume with this remote.",
+      "ko": "이 리모컨으로 볼륨을 조절할 수 있습니다.",
+      "word": "control"
+    },
+    {
+      "sentence": "You need to focus on your study.",
+      "ko": "너는 공부에 집중할 필요가 있다.",
+      "word": "focus"
+    },
+    {
+      "sentence": "The camera will focus automatically.",
+      "ko": "카메라가 자동으로 초점을 맞출 것이다.",
+      "word": "focus"
+    },
+    {
+      "sentence": "I can't concentrate because of the noise.",
+      "ko": "소음 때문에 집중을 할 수가 없다.",
+      "word": "concentrate"
+    },
+    {
+      "sentence": "You can concentrate the juice by boiling it.",
+      "ko": "즙을 끓여서 농축할 수 있다.",
+      "word": "concentrate"
+    },
+    {
+      "sentence": "Your efforts will determine your success.",
+      "ko": "너의 노력이 너의 성공을 결정할 것이다.",
+      "word": "determine"
+    },
+    {
+      "sentence": "He was determined to finish the race.",
+      "ko": "그는 경주를 끝내기로 결심했다.",
+      "word": "determined"
+    },
+    {
+      "sentence": "Scientists are trying to determine the cause of the fire.",
+      "ko": "과학자들은 화재의 원인을 알아내려고 노력 중이다.",
+      "word": "determine"
+    },
+    {
+      "sentence": "What did you conclude from the research?",
+      "ko": "그 연구로부터 당신은 어떤 결론을 내렸습니까?",
+      "word": "conclude"
+    },
+    {
+      "sentence": "Let me conclude my speech with a quote.",
+      "ko": "인용구와 함께 제 연설을 끝내겠습니다.",
+      "word": "conclude"
+    },
+    {
+      "sentence": "The key doesn't fit the lock.",
+      "ko": "열쇠가 자물쇠에 맞지 않는다.",
+      "word": "fit"
+    },
+    {
+      "sentence": "This hat doesn't fit your style.",
+      "ko": "이 모자는 당신의 스타일과 어울리지 않는다.",
+      "word": "fit"
+    },
+    {
+      "sentence": "This book belongs to me.",
+      "ko": "이 책은 나의 것이다.",
+      "word": "belongs"
+    },
+    {
+      "sentence": "He feels that he doesn't belong here.",
+      "ko": "그는 자신이 이곳에 속해 있지 않다고 느낀다.",
+      "word": "belong"
+    },
+    {
+      "sentence": "Accidents can occur at any time.",
+      "ko": "사고는 언제든 발생할 수 있다.",
+      "word": "occur"
+    },
+    {
+      "sentence": "A good idea occurred to me.",
+      "ko": "좋은 생각이 내게 떠올랐다.",
+      "word": "occurred"
+    },
+    {
+      "sentence": "These plants occur naturally in the wild.",
+      "ko": "이 식물들은 야생에서 자연적으로 존재한다.",
+      "word": "occur"
+    },
+    {
+      "sentence": "I didn't notice that you were here.",
+      "ko": "나는 네가 여기 있는 것을 알아차리지 못했다.",
+      "word": "notice"
+    },
+    {
+      "sentence": "People began to notice her talent.",
+      "ko": "사람들이 그녀의 재능에 주목하기 시작했다.",
+      "word": "notice"
+    },
+    {
+      "sentence": "The landlord noticed me to leave.",
+      "ko": "집주인이 나에게 떠나라고 통지했다.",
+      "word": "noticed"
+    },
+    {
+      "sentence": "Please inform me of any changes.",
+      "ko": "변경 사항이 있으면 제게 알려 주세요.",
+      "word": "inform"
+    },
+    {
+      "sentence": "Suppose you won the lottery, what would you do?",
+      "ko": "당신이 복권에 당첨되었다고 가정해 보세요, 무엇을 하겠습니까?",
+      "word": "Suppose"
+    },
+    {
+      "sentence": "I suppose he is busy right now.",
+      "ko": "나는 그가 지금 바쁠 것이라고 생각한다.",
+      "word": "suppose"
+    },
+    {
+      "sentence": "She pretended not to see him.",
+      "ko": "그녀는 그를 보지 못한 척했다.",
+      "word": "pretended"
+    },
+    {
+      "sentence": "I don't pretend to be an expert.",
+      "ko": "나는 전문가라고 주장하지 않는다.",
+      "word": "pretend"
+    },
+    {
+      "sentence": "I suggest that we go for a walk.",
+      "ko": "나는 우리가 산책하러 갈 것을 제안한다.",
+      "word": "suggest"
+    },
+    {
+      "sentence": "Dark clouds suggest that it will rain.",
+      "ko": "먹구름은 비가 올 것임을 암시한다.",
+      "word": "suggest"
+    },
+    {
+      "sentence": "Reading helps you develop your vocabulary.",
+      "ko": "독서는 당신의 어휘력을 발달시키는 데 도움을 준다.",
+      "word": "develop"
+    },
+    {
+      "sentence": "They are trying to develop a new vaccine.",
+      "ko": "그들은 새로운 백신을 개발하려고 노력하고 있다.",
+      "word": "develop"
+    },
+    {
+      "sentence": "I need to have this film developed.",
+      "ko": "나는 이 필름을 현상해야 한다.",
+      "word": "developed"
+    },
+    {
+      "sentence": "Can you locate the city on the map?",
+      "ko": "지도에서 그 도시의 위치를 찾아낼 수 있니?",
+      "word": "locate"
+    },
+    {
+      "sentence": "The hotel is located near the beach.",
+      "ko": "그 호텔은 해변 근처에 위치해 있다.",
+      "word": "located"
+    },
+    {
+      "sentence": "You should separate the recyclables.",
+      "ko": "너는 재활용품을 분리해야 한다.",
+      "word": "separate"
+    },
+    {
+      "sentence": "The war separated many families.",
+      "ko": "전쟁은 많은 가족들을 헤어지게 했다.",
+      "word": "separated"
+    },
+    {
+      "sentence": "The sun disappeared behind the clouds.",
+      "ko": "태양이 구름 뒤로 사라졌다.",
+      "word": "disappeared"
+    },
+    {
+      "sentence": "Many people suffer from headaches.",
+      "ko": "많은 사람들이 두통으로 고통받는다.",
+      "word": "suffer"
+    },
+    {
+      "sentence": "The team suffered a heavy defeat.",
+      "ko": "그 팀은 심한 패배를 겪었다.",
+      "word": "suffered"
+    },
+    {
+      "sentence": "This task requires a lot of patience.",
+      "ko": "이 작업은 많은 인내심을 필요로 한다.",
+      "word": "requires"
+    },
+    {
+      "sentence": "High fences prevent people from entering.",
+      "ko": "높은 울타리가 사람들이 들어오는 것을 막는다.",
+      "word": "prevent"
+    },
+    {
+      "sentence": "Vitamin C helps prevent a cold.",
+      "ko": "비타민 C는 감기를 예방하는 데 도움을 준다.",
+      "word": "prevent"
+    },
+    {
+      "sentence": "Good teachers motivate their students.",
+      "ko": "좋은 선생님들은 학생들에게 동기를 부여한다.",
+      "word": "motivate"
+    },
+    {
+      "sentence": "What motivated your decision?",
+      "ko": "무엇이 당신의 결정의 이유가 되었나요?",
+      "word": "motivated"
+    },
+    {
+      "sentence": "He likes to socialize with his coworkers.",
+      "ko": "그는 동료들과 어울리는 것을 좋아한다.",
+      "word": "socialize"
+    },
+    {
+      "sentence": "Schools help to socialize children.",
+      "ko": "학교는 아이들을 사회화시키는 것을 돕는다.",
+      "word": "socialize"
+    },
+    {
+      "sentence": "A crowd began to gather around the scene.",
+      "ko": "군중이 현장 주변에 모이기 시작했다.",
+      "word": "gather"
+    },
+    {
+      "sentence": "She gathered flowers in the garden.",
+      "ko": "그녀는 정원에서 꽃을 모았다.",
+      "word": "gathered"
+    }
+  ]
+};
+
+    let currentSet = []; let idx = 0; let results = []; let studentName = "";
+
+    function shuffle(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+
+    window.onload = function() {
+        studentName = window.prompt("학생 이름을 입력하세요.", "");
+        if (!studentName || !studentName.trim()) {
+            document.querySelector('.container').innerHTML = '<h1>시험이 취소되었습니다. 새로고침 후 다시 시도하세요.</h1>';
+            return;
+        }
+        studentName = studentName.trim();
+        
+        const unitKey = Object.keys(quizData)[0];
+        if (!unitKey || !quizData[unitKey] || quizData[unitKey].length === 0) {
+            document.querySelector('.container').innerHTML = '<h1>퀴즈 데이터를 불러올 수 없습니다.</h1>';
+            return;
+        }
+
+        let allQuestions = quizData[unitKey];
+        currentSet = shuffle([...allQuestions]).slice(0, 40);
+        
+        if (currentSet.length === 0) {
+            document.querySelector('.container').innerHTML = '<h1>문제가 없습니다.</h1>';
+            return;
+        }
+        
+        idx = 0;
+        results = [];
+        document.getElementById('quiz-screen').classList.add('active');
+        document.getElementById('unit-name').textContent = unitKey;
+        showQ();
+    };
+
+    function showQ() {
+        if (idx >= currentSet.length) {
+            showResult();
+            return;
+        }
+        const q = currentSet[idx];
+        const blank = q.word[0] + "_".repeat(q.word.length - 1);
+        const regex = new RegExp("\\b" + q.word + "\\b", "gi");
+        document.getElementById('en-text').innerHTML = q.sentence.replace(regex, `<span class="blank">${blank}</span>`);
+        document.getElementById('ko-text').textContent = q.ko;
+        document.getElementById('progress').textContent = (idx + 1) + " / " + currentSet.length;
+        document.getElementById('user-input').value = "";
+        document.getElementById('user-input').focus();
+    }
+
+    function handleNext() {
+        const userAns = document.getElementById('user-input').value.trim().toLowerCase();
+        if (!userAns) return; 
+        const correctAns = currentSet[idx].word.toLowerCase();
+        results.push({ q: currentSet[idx], user: userAns, isCorrect: userAns === correctAns });
+        idx++;
+        if (idx < currentSet.length) {
+            showQ();
+        } else {
+            showResult();
+        }
+    }
+    
+    document.getElementById('user-input').addEventListener('keydown', function(event) {
+        if (event.key === 'Enter') {
+            handleNext();
+        }
+    });
+
+    function showResult() {
+        document.getElementById('quiz-screen').classList.remove('active');
+        document.getElementById('result-screen').classList.add('active');
+        const correctCount = results.filter(r => r.isCorrect).length;
+        document.getElementById('res-student').textContent = studentName + " 학생";
+        document.getElementById('final-score').textContent = `총 ${results.length}문제 중 ${correctCount}문제 정답`;
+        
+        const listHtml = results.filter(r => !r.isCorrect).map(r => `
+            <div class="wrong-item">
+                <div style="margin-bottom:5px;">${r.q.sentence.replace(new RegExp(r.q.word, 'gi'), `<b style="color:red">${r.q.word}</b>`)}</div>
+                <div style="font-size:12px; color:blue;">정답: <b class="correct-ans">${r.q.word}</b> | 입력: <b class="wrong-ans">${r.user || '미입력'}</b></div>
+            </div>
+        `).join('');
+        document.getElementById('wrong-list').innerHTML = listHtml || "<div style='padding:20px; color:var(--success-green); font-weight:bold;'>만점입니다!</div>";
+    }
+
+    function downloadResult() {
+        const correctCount = results.filter(r => r.isCorrect).length;
+        const unitName = document.getElementById('unit-name').textContent;
+        let content = `학생명 : ${studentName}\n유닛명 : ${unitName}\n점  수 : ${results.length} 중 ${correctCount}\n\n[오답 기록]\n`;
+        results.filter(r => !r.isCorrect).forEach((r, i) => {
+            content += `${i+1}. 정답: ${r.q.word}, 내 입력: ${r.user}\n   문장: ${r.q.sentence}\n\n`;
+        });
+        const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+        a.download = `결과_${studentName}_${unitName}.txt`;
+        a.click();
+    }
+</script>
+</body>
+</html>
