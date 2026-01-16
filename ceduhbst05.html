@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>어휘끝 고교기본 문장제 시험</title>
+    <style>
+        :root { --main-purple: #5c5cf4; --bg-gray: #f0f2f5; --error-red: #ff4d4d; --success-green: #2ecc71; }
+        body { font-family: 'Apple SD Gothic Neo', sans-serif; background-color: var(--bg-gray); margin: 0; display: flex; justify-content: center; padding: 20px; }
+        .container { background: white; width: 100%; max-width: 500px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); padding: 30px; box-sizing: border-box; text-align: center; }
+        
+        .btn { width: 100%; border: none; border-radius: 12px; padding: 16px; font-size: 16px; font-weight: 700; cursor: pointer; color: white; margin-bottom: 12px; transition: 0.2s; }
+        .btn-purple { background-color: var(--main-purple); }
+        .btn-gray { background-color: #636e72; }
+
+        .screen { display: none; } .active { display: block; }
+        
+        input[type="text"] { width: 100%; padding: 15px; border: 2px solid #e0e0e0; border-radius: 12px; font-size: 17px; box-sizing: border-box; outline: none; }
+
+        .header { display: flex; justify-content: space-between; font-weight: 800; margin-bottom: 25px; font-size: 18px; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px; }
+        .card { background: #f8f9fa; border-radius: 18px; padding: 30px; margin-bottom: 25px; line-height: 1.6; text-align: left; }
+        .en { font-size: 20px; margin-bottom: 12px; color: #2d3436; font-weight: 500; }
+        .ko-hint { font-size: 16px; color: var(--main-purple); font-weight: 600; }
+        .blank { color: var(--main-purple); font-weight: 800; text-decoration: underline; }
+
+        .wrong-list { max-height: 350px; overflow-y: auto; text-align: left; border: 1px solid #eee; padding: 15px; border-radius: 12px; margin-bottom: 25px; background: #fff; }
+        .wrong-item { border-bottom: 1px solid #f0f0f0; padding: 15px 0; font-size: 14px; }
+        .correct-ans { color: #0984e3; font-weight: 700; }
+        .wrong-ans { color: var(--error-red); font-weight: 700; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id="quiz-screen" class="screen">
+        <div class="header">
+            <span id="unit-name">Quiz</span>
+            <span id="progress">0 / 0</span>
+        </div>
+        <div class="card">
+            <div class="en" id="en-text"></div>
+            <div class="ko-hint" id="ko-text"></div>
+        </div>
+        <input type="text" id="user-input" placeholder="정답을 입력하세요..." autocomplete="off">
+        <button class="btn btn-purple" style="margin-top:10px;" onclick="handleNext()">제출</button>
+    </div>
+
+    <div id="result-screen" class="screen">
+        <h2 style="font-size:24px; font-weight:800; margin-top:0;">퀴즈 결과</h2>
+        <div id="res-student" style="font-weight:700; font-size:18px; margin-bottom:10px;"></div>
+        <div id="final-score" style="color:var(--main-purple); font-weight:800; font-size:20px; margin-bottom:25px;"></div>
+        <div style="text-align:left; font-weight:800; margin-bottom:10px;">틀린 문제 내역</div>
+        <div class="wrong-list" id="wrong-list"></div>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+            <button class="btn btn-purple" onclick="downloadResult()">결과 저장</button>
+            <button class="btn btn-gray" onclick="location.href='cedusatst.html'">돌아가기</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    /* 데이터부: AI Studio 생성 데이터 삽입 */
+    const quizData = {
+        "어휘끝 고교기본": [
+            {"sentence": "The news had a major impact on the economy.", "ko": "그 뉴스는 경제에 큰 영향(효과)을 미쳤다.", "word": "impact"},
+            {"sentence": "The impact of the collision damaged the car.", "ko": "충돌의 충격이 차를 파손시켰다.", "word": "impact"},
+            {"sentence": "Technology has impacted every aspect of our lives.", "ko": "기술은 우리 삶의 모든 측면에 영향을 주었다.", "word": "impacted"},
+            {"sentence": "The island has a tropical climate.", "ko": "그 섬은 열대 기후이다.", "word": "climate"},
+            {"sentence": "The current political climate is very tense.", "ko": "현재의 정치적 분위기(풍조)는 매우 긴박하다.", "word": "climate"},
+            {"sentence": "The government is trying to solve the economic crisis.", "ko": "정부는 경제 위기를 해결하기 위해 노력하고 있다.", "word": "crisis"},
+            {"sentence": "She reached a crisis in her career.", "ko": "그녀는 그녀의 경력에서 중대한 기로에 도달했다.", "word": "crisis"},
+            {"sentence": "Plants absorb carbon dioxide from the air.", "ko": "식물은 공기 중에서 이산화탄소를 흡수한다.", "word": "carbon"},
+            {"sentence": "Meat and beans are high in protein.", "ko": "고기와 콩은 단백질 함량이 높다.", "word": "protein"},
+            {"sentence": "The slow motion of the waves was relaxing.", "ko": "파도의 느린 움직임(운동)은 마음을 편안하게 해주었다.", "word": "motion"},
+            {"sentence": "He made a motion for me to sit down.", "ko": "그는 나에게 앉으라는 동작(몸짓)을 했다.", "word": "motion"},
+            {"sentence": "The motion to change the rules was rejected.", "ko": "규칙을 바꾸자는 제안(제의)은 거절되었다.", "word": "motion"},
+            {"sentence": "The waiter motioned us to our table.", "ko": "웨이터는 우리에게 테이블로 오라고 손짓을 했다.", "word": "motioned"},
+            {"sentence": "We spent the weekend enjoying the beauty of nature.", "ko": "우리는 자연의 아름다움을 즐기며 주말을 보냈다.", "word": "nature"},
+            {"sentence": "It is human nature to want more.", "ko": "더 많은 것을 원하는 것은 인간의 본성(천성)이다.", "word": "nature"},
+            {"sentence": "The city has changed a lot over the last decade.", "ko": "그 도시는 지난 10년 동안 많이 변했다.", "word": "decade"},
+            {"sentence": "Safety is our number one priority.", "ko": "안전이 우리의 최우선 사항이다.", "word": "priority"},
+            {"sentence": "This task takes priority over all others.", "ko": "이 일은 다른 모든 일보다 (순서상) 먼저이다.", "word": "priority"},
+            {"sentence": "Only a small minority of people voted.", "ko": "극히 소수의 사람들만이 투표했다.", "word": "minority"},
+            {"sentence": "The government must protect the rights of the minority.", "ko": "정부는 소수 민족(소수 집단)의 권리를 보호해야 한다.", "word": "minority"},
+            {"sentence": "What is the purpose of this meeting?", "ko": "이 회의의 목적은 무엇입니까?", "word": "purpose"},
+            {"sentence": "I didn't break it on purpose.", "ko": "나는 그것을 의도적으로 깨뜨린 것이 아니다.", "word": "purpose"},
+            {"sentence": "My New Year's resolution is to exercise more.", "ko": "나의 새해 결심(결의)은 운동을 더 많이 하는 것이다.", "word": "resolution"},
+            {"sentence": "We are working toward a resolution of the conflict.", "ko": "우리는 갈등의 해결을 위해 노력하고 있다.", "word": "resolution"},
+            {"sentence": "The scent of roses filled the room.", "ko": "장미 향기가 방 안을 가득 채웠다.", "word": "scent"},
+            {"sentence": "Could you do me a favor?", "ko": "부탁(호의) 하나 들어주시겠어요?", "word": "favor"},
+            {"sentence": "Most people are in favor of the new law.", "ko": "대부분의 사람들은 새 법에 찬성(지지)한다.", "word": "favor"},
+            {"sentence": "The coach favored the younger players.", "ko": "그 코치는 더 젊은 선수들에게 호의를 보였다.", "word": "favored"},
+            {"sentence": "Public opinion favored the change.", "ko": "여론은 그 변화를 지지했다.", "word": "favored"},
+            {"sentence": "A high fever is a symptom of the flu.", "ko": "고열은 독감의 증상이다.", "word": "symptom"},
+            {"sentence": "The increase in crime is a symptom of a deeper problem.", "ko": "범죄의 증가는 더 깊은 문제의 징후(조짐)이다.", "word": "symptom"},
+            {"sentence": "The baby has a high fever.", "ko": "아기가 고열이 난다.", "word": "fever"},
+            {"sentence": "World Cup fever has spread across the country.", "ko": "월드컵의 열기가 온 나라에 퍼졌다.", "word": "fever"},
+            {"sentence": "She won first prize in the singing contest.", "ko": "그녀는 노래 경연 대회에서 1등 상을 받았다.", "word": "contest"},
+            {"sentence": "The election was a close contest between two candidates.", "ko": "이번 선거는 두 후보 사이의 박빙의 경쟁(다툼)이었다.", "word": "contest"},
+            {"sentence": "The results of the election were contested.", "ko": "선거 결과에 대해 경쟁(다툼)이 벌어졌다.", "word": "contested"},
+            {"sentence": "Students must wear a school uniform.", "ko": "학생들은 교복(제복)을 입어야 한다.", "word": "uniform"},
+            {"sentence": "The blocks are all of uniform size.", "ko": "블록들은 모두 균일한 크기이다.", "word": "uniform"},
+            {"sentence": "A uniform approach will not work for everyone.", "ko": "획일적인 접근 방식은 모든 사람에게 효과가 있지는 않을 것이다.", "word": "uniform"},
+            {"sentence": "The default settings can be changed in the menu.", "ko": "초기 설정(디폴트)은 메뉴에서 변경할 수 있다.", "word": "default"},
+            {"sentence": "The company is in default on its loans.", "ko": "그 회사는 대출금 채무 불이행 상태이다.", "word": "default"},
+            {"sentence": "The dove is a symbol of peace.", "ko": "비둘기는 평화의 상징이다.", "word": "symbol"},
+            {"sentence": "Use the plus symbol for addition.", "ko": "더하기에는 플러스 기호(부호)를 사용하세요.", "word": "symbol"},
+            {"sentence": "Everyone has the right to freedom of speech.", "ko": "모든 사람은 언론의 자유에 대한 권리가 있다.", "word": "freedom"},
+            {"sentence": "I'll finish the rest of the work tomorrow.", "ko": "나머지 일은 내일 끝낼게요.", "word": "rest"},
+            {"sentence": "They stopped to rest under the tree.", "ko": "그들은 나무 아래에서 쉬기(휴식하기) 위해 멈췄다.", "word": "rest"},
+            {"sentence": "He received an award for his bravery.", "ko": "그는 용맹함으로 상(금)을 받았다.", "word": "award"},
+            {"sentence": "The judges decided to award him the first prize.", "ko": "심사위원들은 그에게 1등 상을 수여하기로 결정했다.", "word": "award"},
+            {"sentence": "Hard work is its own reward.", "ko": "노력은 그 자체로 보상이다.", "word": "reward"},
+            {"sentence": "They will reward you for your help.", "ko": "그들은 당신의 도움에 대해 보상할 것이다.", "word": "reward"},
+            {"sentence": "The company made a huge profit last year.", "ko": "그 회사는 작년에 큰 이익(이득)을 냈다.", "word": "profit"},
+            {"sentence": "He moved to the country for the sake of his health.", "ko": "그는 자신의 건강이라는 이익을 위해 시골로 이사했다.", "word": "sake"},
+            {"sentence": "She works hard for the sake of her family.", "ko": "그녀는 가족이라는 목적을 위해 열심히 일한다.", "word": "sake"},
+            {"sentence": "This is a rare instance of a successful project.", "ko": "이것은 성공적인 프로젝트의 드문 경우(사례)이다.", "word": "instance"},
+            {"sentence": "The book describes a sequence of historical events.", "ko": "그 책은 일련의 역사적 사건들의 연속을 묘사한다.", "word": "sequence"},
+            {"sentence": "Put the cards in the correct sequence.", "ko": "카드를 올바른 순서대로 놓으세요.", "word": "sequence"},
+            {"sentence": "He has perfect vision.", "ko": "그는 완벽한 시력을 가지고 있다.", "word": "vision"},
+            {"sentence": "The leader had a vision for the future of the company.", "ko": "그 리더는 회사의 미래에 대한 통찰력(선견지명)을 가지고 있었다.", "word": "vision"},
+            {"sentence": "Their mission was to find a new source of water.", "ko": "그들의 임무는 새로운 수원지를 찾는 것이었다.", "word": "mission"},
+            {"sentence": "She feels that teaching is her mission in life.", "ko": "그녀는 가르치는 것이 그녀의 인생 사명(천직)이라고 느낀다.", "word": "mission"}
+        ]
+    };
+
+    let currentSet = []; let idx = 0; let results = []; let studentName = "";
+
+    function shuffle(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+
+    window.onload = function() {
+        studentName = window.prompt("학생 이름을 입력하세요.", "");
+        if (!studentName || !studentName.trim()) {
+            document.querySelector('.container').innerHTML = '<h1>시험이 취소되었습니다. 새로고침 후 다시 시도하세요.</h1>';
+            return;
+        }
+        studentName = studentName.trim();
+        
+        const unitKey = Object.keys(quizData)[0];
+        if (!unitKey || !quizData[unitKey] || quizData[unitKey].length === 0) {
+            document.querySelector('.container').innerHTML = '<h1>퀴즈 데이터를 불러올 수 없습니다.</h1>';
+            return;
+        }
+
+        let allQuestions = quizData[unitKey];
+        currentSet = shuffle([...allQuestions]).slice(0, 40);
+        
+        if (currentSet.length === 0) {
+            document.querySelector('.container').innerHTML = '<h1>문제가 없습니다.</h1>';
+            return;
+        }
+        
+        idx = 0;
+        results = [];
+        document.getElementById('quiz-screen').classList.add('active');
+        document.getElementById('unit-name').textContent = unitKey;
+        showQ();
+    };
+
+    function showQ() {
+        if (idx >= currentSet.length) {
+            showResult();
+            return;
+        }
+        const q = currentSet[idx];
+        const blank = q.word[0] + "_".repeat(q.word.length - 1);
+        const regex = new RegExp("\\b" + q.word + "\\b", "gi");
+        document.getElementById('en-text').innerHTML = q.sentence.replace(regex, `<span class="blank">${blank}</span>`);
+        document.getElementById('ko-text').textContent = q.ko;
+        document.getElementById('progress').textContent = (idx + 1) + " / " + currentSet.length;
+        document.getElementById('user-input').value = "";
+        document.getElementById('user-input').focus();
+    }
+
+    function handleNext() {
+        const userAns = document.getElementById('user-input').value.trim().toLowerCase();
+        if (!userAns) return; 
+        const correctAns = currentSet[idx].word.toLowerCase();
+        results.push({ q: currentSet[idx], user: userAns, isCorrect: userAns === correctAns });
+        idx++;
+        if (idx < currentSet.length) {
+            showQ();
+        } else {
+            showResult();
+        }
+    }
+    
+    document.getElementById('user-input').addEventListener('keydown', function(event) {
+        if (event.key === 'Enter') {
+            handleNext();
+        }
+    });
+
+    function showResult() {
+        document.getElementById('quiz-screen').classList.remove('active');
+        document.getElementById('result-screen').classList.add('active');
+        const correctCount = results.filter(r => r.isCorrect).length;
+        document.getElementById('res-student').textContent = studentName + " 학생";
+        document.getElementById('final-score').textContent = `총 ${results.length}문제 중 ${correctCount}문제 정답`;
+        
+        const listHtml = results.filter(r => !r.isCorrect).map(r => `
+            <div class="wrong-item">
+                <div style="margin-bottom:5px;">${r.q.sentence.replace(new RegExp(r.q.word, 'gi'), `<b>${r.q.word}</b>`)}</div>
+                <div style="font-size:12px; color:blue;">정답: <b class="correct-ans">${r.q.word}</b> | 입력: <b class="wrong-ans">${r.user || '미입력'}</b></div>
+            </div>
+        `).join('');
+        document.getElementById('wrong-list').innerHTML = listHtml || "<div style='padding:20px; color:var(--success-green); font-weight:bold;'>만점입니다!</div>";
+    }
+
+    function downloadResult() {
+        const correctCount = results.filter(r => r.isCorrect).length;
+        const unitName = document.getElementById('unit-name').textContent;
+        let content = `학생명 : ${studentName}\n유닛명 : ${unitName}\n점  수 : ${results.length} 중 ${correctCount}\n\n[오답 기록]\n`;
+        results.filter(r => !r.isCorrect).forEach((r, i) => {
+            content += `${i+1}. 정답: ${r.q.word}, 내 입력: ${r.user}\n   문장: ${r.q.sentence}\n\n`;
+        });
+        const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+        a.download = `결과_${studentName}_${unitName}.txt`;
+        a.click();
+    }
+</script>
+</body>
+</html>
