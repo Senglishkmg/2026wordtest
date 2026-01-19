@@ -60,320 +60,69 @@
 
 <script>
     /* 데이터부: AI Studio 생성 데이터 삽입 */
-    const quizData = {
-  "어휘끝 고교기본 01": [
-    {
-      "sentence": "It is difficult to compare these two smartphones.",
-      "ko": "이 두 스마트폰을 비교하는 것은 어렵다.",
-      "word": "compare"
-    },
-    {
-      "sentence": "Poets often compare life to a journey.",
-      "ko": "시인들은 종종 인생을 여행에 비유한다.",
-      "word": "compare"
-    },
-    {
-      "sentence": "We should divide the cake into eight pieces.",
-      "ko": "우리는 케이크를 여덟 조각으로 나누어야 한다.",
-      "word": "divide"
-    },
-    {
-      "sentence": "The path divides into two at the river.",
-      "ko": "강가에서 길이 둘로 갈라진다.",
-      "word": "divides"
-    },
-    {
-      "sentence": "I can't relate these two events to each other.",
-      "ko": "나는 이 두 사건을 서로 관련시킬 수 없다.",
-      "word": "relate"
-    },
-    {
-      "sentence": "The results relate to how much you practiced.",
-      "ko": "그 결과는 당신이 얼마나 많이 연습했는지와 관련이 있다.",
-      "word": "relate"
-    },
-    {
-      "sentence": "He decided to leave the company next month.",
-      "ko": "그는 다음 달에 회사를 떠나기로 결정했다.",
-      "word": "leave"
-    },
-    {
-      "sentence": "Don't leave your umbrella in the taxi.",
-      "ko": "택시에 우산을 남겨 두지 마세요.",
-      "word": "leave"
-    },
-    {
-      "sentence": "Just follow me and you won't get lost.",
-      "ko": "그냥 저를 따라오시면 길을 잃지 않을 것입니다.",
-      "word": "follow"
-    },
-    {
-      "sentence": "You must follow the safety instructions.",
-      "ko": "당신은 안전 지침을 따라야 합니다.",
-      "word": "follow"
-    },
-    {
-      "sentence": "I'm sorry, I don't follow your logic.",
-      "ko": "죄송합니다만, 당신의 논리를 이해하지 못하겠습니다.",
-      "word": "follow"
-    },
-    {
-      "sentence": "She had to endure the pain for a long time.",
-      "ko": "그녀는 오랫동안 고통을 견뎌야 했다.",
-      "word": "endure"
-    },
-    {
-      "sentence": "Their friendship will endure forever.",
-      "ko": "그들의 우정은 영원히 지속될 것이다.",
-      "word": "endure"
-    },
-    {
-      "sentence": "The law forbids smoking in public places.",
-      "ko": "법은 공공장소에서의 흡연을 금지한다.",
-      "word": "forbids"
-    },
-    {
-      "sentence": "It's hard to control the crowd at the concert.",
-      "ko": "콘서트장에서 군중을 통제하는 것은 어렵다.",
-      "word": "control"
-    },
-    {
-      "sentence": "No one can control my life but me.",
-      "ko": "나 말고는 누구도 내 인생을 지배할 수 없다.",
-      "word": "control"
-    },
-    {
-      "sentence": "You can control the volume with this remote.",
-      "ko": "이 리모컨으로 볼륨을 조절할 수 있습니다.",
-      "word": "control"
-    },
-    {
-      "sentence": "You need to focus on your study.",
-      "ko": "너는 공부에 집중할 필요가 있다.",
-      "word": "focus"
-    },
-    {
-      "sentence": "The camera will focus automatically.",
-      "ko": "카메라가 자동으로 초점을 맞출 것이다.",
-      "word": "focus"
-    },
-    {
-      "sentence": "I can't concentrate because of the noise.",
-      "ko": "소음 때문에 집중을 할 수가 없다.",
-      "word": "concentrate"
-    },
-    {
-      "sentence": "You can concentrate the juice by boiling it.",
-      "ko": "즙을 끓여서 농축할 수 있다.",
-      "word": "concentrate"
-    },
-    {
-      "sentence": "Your efforts will determine your success.",
-      "ko": "너의 노력이 너의 성공을 결정할 것이다.",
-      "word": "determine"
-    },
-    {
-      "sentence": "He was determined to finish the race.",
-      "ko": "그는 경주를 끝내기로 결심했다.",
-      "word": "determined"
-    },
-    {
-      "sentence": "Scientists are trying to determine the cause of the fire.",
-      "ko": "과학자들은 화재의 원인을 알아내려고 노력 중이다.",
-      "word": "determine"
-    },
-    {
-      "sentence": "What did you conclude from the research?",
-      "ko": "그 연구로부터 당신은 어떤 결론을 내렸습니까?",
-      "word": "conclude"
-    },
-    {
-      "sentence": "Let me conclude my speech with a quote.",
-      "ko": "인용구와 함께 제 연설을 끝내겠습니다.",
-      "word": "conclude"
-    },
-    {
-      "sentence": "The key doesn't fit the lock.",
-      "ko": "열쇠가 자물쇠에 맞지 않는다.",
-      "word": "fit"
-    },
-    {
-      "sentence": "This hat doesn't fit your style.",
-      "ko": "이 모자는 당신의 스타일과 어울리지 않는다.",
-      "word": "fit"
-    },
-    {
-      "sentence": "This book belongs to me.",
-      "ko": "이 책은 나의 것이다.",
-      "word": "belongs"
-    },
-    {
-      "sentence": "He feels that he doesn't belong here.",
-      "ko": "그는 자신이 이곳에 속해 있지 않다고 느낀다.",
-      "word": "belong"
-    },
-    {
-      "sentence": "Accidents can occur at any time.",
-      "ko": "사고는 언제든 발생할 수 있다.",
-      "word": "occur"
-    },
-    {
-      "sentence": "A good idea occurred to me.",
-      "ko": "좋은 생각이 내게 떠올랐다.",
-      "word": "occurred"
-    },
-    {
-      "sentence": "These plants occur naturally in the wild.",
-      "ko": "이 식물들은 야생에서 자연적으로 존재한다.",
-      "word": "occur"
-    },
-    {
-      "sentence": "I didn't notice that you were here.",
-      "ko": "나는 네가 여기 있는 것을 알아차리지 못했다.",
-      "word": "notice"
-    },
-    {
-      "sentence": "People began to notice her talent.",
-      "ko": "사람들이 그녀의 재능에 주목하기 시작했다.",
-      "word": "notice"
-    },
-    {
-      "sentence": "The landlord noticed me to leave.",
-      "ko": "집주인이 나에게 떠나라고 통지했다.",
-      "word": "noticed"
-    },
-    {
-      "sentence": "Please inform me of any changes.",
-      "ko": "변경 사항이 있으면 제게 알려 주세요.",
-      "word": "inform"
-    },
-    {
-      "sentence": "Suppose you won the lottery, what would you do?",
-      "ko": "당신이 복권에 당첨되었다고 가정해 보세요, 무엇을 하겠습니까?",
-      "word": "Suppose"
-    },
-    {
-      "sentence": "I suppose he is busy right now.",
-      "ko": "나는 그가 지금 바쁠 것이라고 생각한다.",
-      "word": "suppose"
-    },
-    {
-      "sentence": "She pretended not to see him.",
-      "ko": "그녀는 그를 보지 못한 척했다.",
-      "word": "pretended"
-    },
-    {
-      "sentence": "I don't pretend to be an expert.",
-      "ko": "나는 전문가라고 주장하지 않는다.",
-      "word": "pretend"
-    },
-    {
-      "sentence": "I suggest that we go for a walk.",
-      "ko": "나는 우리가 산책하러 갈 것을 제안한다.",
-      "word": "suggest"
-    },
-    {
-      "sentence": "Dark clouds suggest that it will rain.",
-      "ko": "먹구름은 비가 올 것임을 암시한다.",
-      "word": "suggest"
-    },
-    {
-      "sentence": "Reading helps you develop your vocabulary.",
-      "ko": "독서는 당신의 어휘력을 발달시키는 데 도움을 준다.",
-      "word": "develop"
-    },
-    {
-      "sentence": "They are trying to develop a new vaccine.",
-      "ko": "그들은 새로운 백신을 개발하려고 노력하고 있다.",
-      "word": "develop"
-    },
-    {
-      "sentence": "I need to have this film developed.",
-      "ko": "나는 이 필름을 현상해야 한다.",
-      "word": "developed"
-    },
-    {
-      "sentence": "Can you locate the city on the map?",
-      "ko": "지도에서 그 도시의 위치를 찾아낼 수 있니?",
-      "word": "locate"
-    },
-    {
-      "sentence": "The hotel is located near the beach.",
-      "ko": "그 호텔은 해변 근처에 위치해 있다.",
-      "word": "located"
-    },
-    {
-      "sentence": "You should separate the recyclables.",
-      "ko": "너는 재활용품을 분리해야 한다.",
-      "word": "separate"
-    },
-    {
-      "sentence": "The war separated many families.",
-      "ko": "전쟁은 많은 가족들을 헤어지게 했다.",
-      "word": "separated"
-    },
-    {
-      "sentence": "The sun disappeared behind the clouds.",
-      "ko": "태양이 구름 뒤로 사라졌다.",
-      "word": "disappeared"
-    },
-    {
-      "sentence": "Many people suffer from headaches.",
-      "ko": "많은 사람들이 두통으로 고통받는다.",
-      "word": "suffer"
-    },
-    {
-      "sentence": "The team suffered a heavy defeat.",
-      "ko": "그 팀은 심한 패배를 겪었다.",
-      "word": "suffered"
-    },
-    {
-      "sentence": "This task requires a lot of patience.",
-      "ko": "이 작업은 많은 인내심을 필요로 한다.",
-      "word": "requires"
-    },
-    {
-      "sentence": "High fences prevent people from entering.",
-      "ko": "높은 울타리가 사람들이 들어오는 것을 막는다.",
-      "word": "prevent"
-    },
-    {
-      "sentence": "Vitamin C helps prevent a cold.",
-      "ko": "비타민 C는 감기를 예방하는 데 도움을 준다.",
-      "word": "prevent"
-    },
-    {
-      "sentence": "Good teachers motivate their students.",
-      "ko": "좋은 선생님들은 학생들에게 동기를 부여한다.",
-      "word": "motivate"
-    },
-    {
-      "sentence": "What motivated your decision?",
-      "ko": "무엇이 당신의 결정의 이유가 되었나요?",
-      "word": "motivated"
-    },
-    {
-      "sentence": "He likes to socialize with his coworkers.",
-      "ko": "그는 동료들과 어울리는 것을 좋아한다.",
-      "word": "socialize"
-    },
-    {
-      "sentence": "Schools help to socialize children.",
-      "ko": "학교는 아이들을 사회화시키는 것을 돕는다.",
-      "word": "socialize"
-    },
-    {
-      "sentence": "A crowd began to gather around the scene.",
-      "ko": "군중이 현장 주변에 모이기 시작했다.",
-      "word": "gather"
-    },
-    {
-      "sentence": "She gathered flowers in the garden.",
-      "ko": "그녀는 정원에서 꽃을 모았다.",
-      "word": "gathered"
-    }
-  ]
-};
+    const quizData = { "Vocabulary Quiz": [
+    { "sentence": "It is helpful to compare the prices before buying.", "ko": "구매하기 전에 가격을 비교하는 것이 도움이 된다.", "word": "compare" },
+    { "sentence": "Life is often compared to a voyage.", "ko": "인생은 종종 항해에 비유된다.", "word": "compared" },
+    { "sentence": "Let's divide the cake into six pieces.", "ko": "케이크를 여섯 조각으로 나누자.", "word": "divide" },
+    { "sentence": "The river divides into two branches here.", "ko": "강이 여기에서 두 갈래로 갈라진다.", "word": "divides" },
+    { "sentence": "It is difficult to relate these two events.", "ko": "이 두 사건을 관련시키는 것은 어렵다.", "word": "relate" },
+    { "sentence": "The symptoms relate to a lack of sleep.", "ko": "그 증상들은 수면 부족과 관련이 있다.", "word": "relate" },
+    { "sentence": "He decided to leave the company next month.", "ko": "그는 다음 달에 회사를 떠나기로 결정했다.", "word": "leave" },
+    { "sentence": "Don't leave your umbrella in the bus.", "ko": "버스에 우산을 두고 남기지 마세요.", "word": "leave" },
+    { "sentence": "Please follow me to the meeting room.", "ko": "회의실까지 저를 따라오세요.", "word": "follow" },
+    { "sentence": "You must follow the safety instructions.", "ko": "당신은 안전 지시를 따라야 합니다.", "word": "follow" },
+    { "sentence": "I'm sorry, I don't follow what you're saying.", "ko": "죄송합니다만, 당신이 하는 말을 이해하지 못하겠어요.", "word": "follow" },
+    { "sentence": "She had to endure many hardships.", "ko": "그녀는 많은 고난을 견뎌야 했다.", "word": "endure" },
+    { "sentence": "Their friendship has endured for decades.", "ko": "그들의 우정은 수십 년 동안 지속되었다.", "word": "endured" },
+    { "sentence": "My parents forbid me from staying out late.", "ko": "부모님은 내가 늦게까지 밖에 있는 것을 금지하신다.", "word": "forbid" },
+    { "sentence": "It's important to control your emotions.", "ko": "당신의 감정을 통제하는 것이 중요하다.", "word": "control" },
+    { "sentence": "The dictator tried to control the whole country.", "ko": "독재자는 나라 전체를 지배하려 했다.", "word": "control" },
+    { "sentence": "This switch controls the brightness of the light.", "ko": "이 스위치는 빛의 밝기를 조절한다.", "word": "controls" },
+    { "sentence": "You need to focus on your studies.", "ko": "너는 학업에 집중할 필요가 있다.", "word": "focus" },
+    { "sentence": "The photographer focused the lens on the flower.", "ko": "사진작가는 꽃에 렌즈의 초점을 맞췄다.", "word": "focused" },
+    { "sentence": "I can't concentrate because of the noise.", "ko": "시끄러워서 집중할 수가 없다.", "word": "concentrate" },
+    { "sentence": "The juice is made from concentrated orange extract.", "ko": "그 주스는 농축된 오렌지 추출물로 만들어졌다.", "word": "concentrated" },
+    { "sentence": "Demand will determine the price of the product.", "ko": "수요가 제품의 가격을 결정할 것이다.", "word": "determine" },
+    { "sentence": "She determined to pass the exam this time.", "ko": "그녀는 이번에 시험에 합격하기로 결심했다.", "word": "determined" },
+    { "sentence": "Experts are trying to determine the cause of the fire.", "ko": "전문가들이 화재 원인을 밝혀내려 노력하고 있다.", "word": "determine" },
+    { "sentence": "What do you conclude from the evidence?", "ko": "증거로부터 어떤 결론을 내리시겠습니까?", "word": "conclude" },
+    { "sentence": "The meeting concluded with a brief prayer.", "ko": "그 회의는 짧은 기도로 끝났다.", "word": "concluded" },
+    { "sentence": "The key doesn't fit the lock.", "ko": "그 열쇠는 자물쇠에 맞지 않는다.", "word": "fit" },
+    { "sentence": "This dress fits you perfectly.", "ko": "이 드레스는 당신에게 아주 잘 어울린다.", "word": "fits" },
+    { "sentence": "This book belongs to the library.", "ko": "이 책은 도서관의 소유이다.", "word": "belongs" },
+    { "sentence": "I feel like I don't belong here.", "ko": "나는 여기에 속해 있지 않다는 느낌이 든다.", "word": "belong" },
+    { "sentence": "Earthquakes occur frequently in this region.", "ko": "이 지역에서는 지진이 빈번하게 발생한다.", "word": "occur" },
+    { "sentence": "An interesting idea occurred to me.", "ko": "흥미로운 생각이 나에게 떠올랐다.", "word": "occurred" },
+    { "sentence": "These plants occur naturally in the wild.", "ko": "이 식물들은 야생에서 자연적으로 존재한다.", "word": "occur" },
+    { "sentence": "I didn't notice that you were there.", "ko": "나는 네가 거기 있는 것을 알아차리지 못했다.", "word": "notice" },
+    { "sentence": "The audience noticed her talent immediately.", "ko": "청중은 그녀의 재능을 즉시 주목했다.", "word": "noticed" },
+    { "sentence": "The boss noticed the staff of the upcoming meeting.", "ko": "상사는 직원들에게 다가올 회의를 통지했다.", "word": "noticed" },
+    { "sentence": "Please inform us of any changes in your address.", "ko": "주소가 변경되면 저희에게 알려 주시기 바랍니다.", "word": "inform" },
+    { "sentence": "Suppose you won the lottery, what would you do?", "ko": "네가 복권에 당첨되었다고 가정하면 무엇을 하겠니?", "word": "Suppose" },
+    { "sentence": "I suppose he will be late again.", "ko": "그가 또 늦을 것이라고 생각한다.", "word": "suppose" },
+    { "sentence": "She pretended to be asleep when I entered.", "ko": "내가 들어갔을 때 그녀는 자는 척했다.", "word": "pretended" },
+    { "sentence": "I suggest that we take a break.", "ko": "나는 우리가 휴식을 취할 것을 제안한다.", "word": "suggest" },
+    { "sentence": "Recent data suggests a change in the climate.", "ko": "최근 자료는 기후의 변화를 암시한다.", "word": "suggests" },
+    { "sentence": "The child is developing very fast.", "ko": "그 아이는 매우 빠르게 발달하고 있다.", "word": "developing" },
+    { "sentence": "Scientists are developing a new vaccine.", "ko": "과학자들은 새로운 백신을 개발하고 있다.", "word": "developing" },
+    { "sentence": "I need to have this film developed.", "ko": "이 필름을 현상해야 한다.", "word": "developed" },
+    { "sentence": "Can you locate the city on this map?", "ko": "이 지도에서 그 도시의 위치를 찾아낼 수 있니?", "word": "locate" },
+    { "sentence": "The hotel is located near the beach.", "ko": "그 호텔은 해변 근처에 위치하고 있다.", "word": "located" },
+    { "sentence": "The teacher decided to seperate the two students.", "ko": "선생님은 그 두 학생을 분리하기로 결정했다.", "word": "seperate" },
+    { "sentence": "The couple decided to seperate after many arguments.", "ko": "그 부부는 많은 다툼 끝에 헤어지기로 했다.", "word": "seperate" },
+    { "sentence": "The sun disappeared behind the clouds.", "ko": "태양이 구름 뒤로 사라졌다.", "word": "disappeared" },
+    { "sentence": "Many people suffer from allergies in spring.", "ko": "많은 사람들이 봄에 알레르기로 고통을 받는다.", "word": "suffer" },
+    { "sentence": "The company suffered a huge loss this year.", "ko": "그 회사는 올해 큰 손해를 겪었다.", "word": "suffered" },
+    { "sentence": "This job requires a lot of patience.", "ko": "이 일은 많은 인내심을 필요로 한다.", "word": "requires" },
+    { "sentence": "Seat belts help prevent injuries.", "ko": "안전벨트는 부상을 막는 데 도움이 된다.", "word": "prevent" },
+    { "sentence": "Good hygiene can prevent many diseases.", "ko": "좋은 위생은 많은 질병을 예방할 수 있다.", "word": "prevent" },
+    { "sentence": "The teacher knows how to motivate students.", "ko": "그 선생님은 학생들에게 동기를 부여하는 법을 안다.", "word": "motivate" },
+    { "sentence": "Fear of failure can motivate people to work hard.", "ko": "실패에 대한 두려움이 사람들이 열심히 일하는 이유가 될 수 있다.", "word": "motivate" },
+    { "sentence": "He likes to socialize with his colleagues after work.", "ko": "그는 퇴근 후에 동료들과 어울리는 것을 좋아한다.", "word": "socialize" },
+    { "sentence": "Schools help to socialize children.", "ko": "학교는 아이들을 사회화시키는 것을 돕는다.", "word": "socialize" },
+    { "sentence": "A crowd gathered to see the performance.", "ko": "공연을 보기 위해 군중이 모였다.", "word": "gathered" },
+    { "sentence": "She gathered some flowers from the garden.", "ko": "그녀는 정원에서 꽃을 좀 모았다.", "word": "gathered" }
+] };
 
     let currentSet = []; let idx = 0; let results = []; let studentName = "";
 
