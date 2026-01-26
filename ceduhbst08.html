@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>어휘끝 고교기본 문장제 시험</title>
+    <style>
+        :root { --main-purple: #5c5cf4; --bg-gray: #f0f2f5; --error-red: #ff4d4d; --success-green: #2ecc71; }
+        body { font-family: 'Apple SD Gothic Neo', sans-serif; background-color: var(--bg-gray); margin: 0; display: flex; justify-content: center; padding: 20px; }
+        .container { background: white; width: 100%; max-width: 500px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); padding: 30px; box-sizing: border-box; text-align: center; }
+        
+        .btn { width: 100%; border: none; border-radius: 12px; padding: 16px; font-size: 16px; font-weight: 700; cursor: pointer; color: white; margin-bottom: 12px; transition: 0.2s; }
+        .btn-purple { background-color: var(--main-purple); }
+        .btn-gray { background-color: #636e72; }
+
+        .screen { display: none; } .active { display: block; }
+        
+        input[type="text"] { width: 100%; padding: 15px; border: 2px solid #e0e0e0; border-radius: 12px; font-size: 17px; box-sizing: border-box; outline: none; }
+
+        .header { display: flex; justify-content: space-between; font-weight: 800; margin-bottom: 25px; font-size: 18px; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px; }
+        .card { background: #f8f9fa; border-radius: 18px; padding: 30px; margin-bottom: 25px; line-height: 1.6; text-align: left; }
+        .en { font-size: 20px; margin-bottom: 12px; color: #2d3436; font-weight: 500; }
+        .ko-hint { font-size: 16px; color: var(--main-purple); font-weight: 600; }
+        .blank { color: var(--main-purple); font-weight: 800; text-decoration: underline; }
+
+        .wrong-list { max-height: 350px; overflow-y: auto; text-align: left; border: 1px solid #eee; padding: 15px; border-radius: 12px; margin-bottom: 25px; background: #fff; }
+        .wrong-item { border-bottom: 1px solid #f0f0f0; padding: 15px 0; font-size: 14px; }
+        .correct-ans { color: #0984e3; font-weight: 700; }
+        .wrong-ans { color: var(--error-red); font-weight: 700; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id="quiz-screen" class="screen">
+        <div class="header">
+            <span id="unit-name">Quiz</span>
+            <span id="progress">0 / 0</span>
+        </div>
+        <div class="card">
+            <div class="en" id="en-text"></div>
+            <div class="ko-hint" id="ko-text"></div>
+        </div>
+        <input type="text" id="user-input" placeholder="정답을 입력하세요..." autocomplete="off">
+        <button class="btn btn-purple" style="margin-top:10px;" onclick="handleNext()">제출</button>
+    </div>
+
+    <div id="result-screen" class="screen">
+        <h2 style="font-size:24px; font-weight:800; margin-top:0;">퀴즈 결과</h2>
+        <div id="res-student" style="font-weight:700; font-size:18px; margin-bottom:10px;"></div>
+        <div id="final-score" style="color:var(--main-purple); font-weight:800; font-size:20px; margin-bottom:25px;"></div>
+        <div style="text-align:left; font-weight:800; margin-bottom:10px;">틀린 문제 내역</div>
+        <div class="wrong-list" id="wrong-list"></div>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+            <button class="btn btn-purple" onclick="downloadResult()">결과 저장</button>
+            <button class="btn btn-gray" onclick="location.href='cedusatst.html'">돌아가기</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    /* 데이터부: AI Studio 생성 데이터 삽입 */
+    const quizData = {
+  "Unit 18": [
+    {
+      "sentence": "The entire village was destroyed by the fire.",
+      "ko": "마을 전체가 화재로 파괴되었습니다.",
+      "word": "entire"
+    },
+    {
+      "sentence": "The entire process of building the house took one year.",
+      "ko": "집을 짓는 완전한 과정은 1년이 걸렸습니다.",
+      "word": "entire"
+    },
+    {
+      "sentence": "He has broad shoulders and a strong build.",
+      "ko": "그는 어깨가 넓고 체격이 튼튼합니다.",
+      "word": "broad"
+    },
+    {
+      "sentence": "The report provides a broad overview of the current situation.",
+      "ko": "그 보고서는 현재 상황에 대한 전반적인 개요를 제공합니다.",
+      "word": "broad"
+    },
+    {
+      "sentence": "They had a brief meeting before the ceremony.",
+      "ko": "그들은 의식 전에 잠시 동안의 짧은 회의를 가졌습니다.",
+      "word": "brief"
+    },
+    {
+      "sentence": "Please keep your explanation as brief as possible.",
+      "ko": "설명을 가능한 한 간단하게 해주세요.",
+      "word": "brief"
+    },
+    {
+      "sentence": "This is only a temporary solution to the problem.",
+      "ko": "이것은 문제에 대한 단지 일시적인 해결책일 뿐입니다.",
+      "word": "temporary"
+    },
+    {
+      "sentence": "She found a temporary job for the summer vacation.",
+      "ko": "그녀는 여름 방학 동안 할 임시 일자리를 찾았습니다.",
+      "word": "temporary"
+    },
+    {
+      "sentence": "He is a frequent visitor to this local cafe.",
+      "ko": "그는 이 지역 카페의 자주 일어나는(빈번한) 방문객입니다.",
+      "word": "frequent"
+    },
+    {
+      "sentence": "The survey used a random sample of people.",
+      "ko": "그 설문 조사는 무작위의 사람 표본을 사용했습니다.",
+      "word": "random"
+    },
+    {
+      "sentence": "The universe is thought to be infinite in size.",
+      "ko": "우주는 크기에 있어 무한하다고 생각됩니다.",
+      "word": "infinite"
+    },
+    {
+      "sentence": "His initial reaction was one of total surprise.",
+      "ko": "그의 처음 반응은 완전히 놀란 것이었습니다.",
+      "word": "initial"
+    },
+    {
+      "sentence": "He carved his initials into the trunk of the tree.",
+      "ko": "그는 나무줄기에 자신의 이름 머리글자들을 새겼습니다.",
+      "word": "initials"
+    },
+    {
+      "sentence": "The experience was more valuable than any money.",
+      "ko": "그 경험은 어떤 돈보다 더 소중했습니다.",
+      "word": "valuable"
+    },
+    {
+      "sentence": "The museum displays many valuable items from the past.",
+      "ko": "그 박물관은 과거의 많은 값비싼 물건들을 전시합니다.",
+      "word": "valuable"
+    },
+    {
+      "sentence": "You should be cautious when walking alone at night.",
+      "ko": "밤에 혼자 걸을 때는 조심해야 합니다.",
+      "word": "cautious"
+    },
+    {
+      "sentence": "She has been consistent in her efforts to learn English.",
+      "ko": "그녀는 영어를 배우려는 노력에 있어 한결같았습니다.",
+      "word": "consistent"
+    },
+    {
+      "sentence": "The results are consistent with the data we collected.",
+      "ko": "그 결과는 우리가 수집한 데이터와 일치합니다.",
+      "word": "consistent"
+    },
+    {
+      "sentence": "The new machine is much more efficient than the old one.",
+      "ko": "새 기계는 낡은 것보다 훨씬 더 효율적입니다.",
+      "word": "efficient"
+    },
+    {
+      "sentence": "This movie is not suitable for young children.",
+      "ko": "이 영화는 어린아이들에게 적합하지 않습니다.",
+      "word": "suitable"
+    },
+    {
+      "sentence": "The room was in absolute silence during the exam.",
+      "ko": "시험 시간 동안 방 안은 완전한 침묵 속에 있었습니다.",
+      "word": "absolute"
+    },
+    {
+      "sentence": "The king had absolute power over his subjects.",
+      "ko": "왕은 그의 신하들에 대해 절대적인 권력을 가졌습니다.",
+      "word": "absolute"
+    },
+    {
+      "sentence": "The lighting in the room is not adequate for reading.",
+      "ko": "방 안의 조명이 독서에 충분하지 않습니다.",
+      "word": "adequate"
+    },
+    {
+      "sentence": "The stage of the project is at an intermediate level.",
+      "ko": "그 프로젝트의 단계는 중간 수준에 있습니다.",
+      "word": "intermediate"
+    },
+    {
+      "sentence": "I am looking for an intermediate Spanish course.",
+      "ko": "나는 중급 스페인어 코스를 찾고 있습니다.",
+      "word": "intermediate"
+    },
+    {
+      "sentence": "This class is specifically designed for intermediates.",
+      "ko": "이 수업은 특히 중급자들을 위해 설계되었습니다.",
+      "word": "intermediates"
+    },
+    {
+      "sentence": "Gold and diamonds are precious materials.",
+      "ko": "금과 다이아몬드는 귀중한 재료입니다.",
+      "word": "precious"
+    },
+    {
+      "sentence": "I don't want to waste my precious time on this.",
+      "ko": "나는 이것에 내 소중한 시간을 낭비하고 싶지 않습니다.",
+      "word": "precious"
+    },
+    {
+      "sentence": "Traffic is a major problem in this growing city.",
+      "ko": "이 성장하는 도시에서 교통은 주된 문제입니다.",
+      "word": "major"
+    },
+    {
+      "sentence": "My major in university was English literature.",
+      "ko": "나의 대학 전공은 영문학이었습니다.",
+      "word": "major"
+    },
+    {
+      "sentence": "He decided to major in history next semester.",
+      "ko": "그는 다음 학기에 역사를 전공하기로 결정했습니다.",
+      "word": "major"
+    },
+    {
+      "sentence": "She works in the corporate headquarters in Seoul.",
+      "ko": "그녀는 서울에 있는 기업 본사에서 근무합니다.",
+      "word": "corporate"
+    },
+    {
+      "sentence": "Protecting the environment is a corporate effort.",
+      "ko": "환경을 보호하는 것은 공동의 노력입니다.",
+      "word": "corporate"
+    },
+    {
+      "sentence": "This path leads to a private beach.",
+      "ko": "이 길은 개인 소유의 해변으로 이어집니다.",
+      "word": "private"
+    },
+    {
+      "sentence": "He kept his private life away from the media.",
+      "ko": "그는 자신의 사적인 생활을 미디어로부터 멀리 유지했습니다.",
+      "word": "private"
+    },
+    {
+      "sentence": "The government is trying to solve urban problems.",
+      "ko": "정부는 도시의 문제들을 해결하기 위해 노력하고 있습니다.",
+      "word": "urban"
+    },
+    {
+      "sentence": "Contrary to my expectations, the test was easy.",
+      "ko": "나의 예상과는 반대되게, 그 시험은 쉬웠습니다.",
+      "word": "contrary"
+    },
+    {
+      "sentence": "They held contrary opinions on the new policy.",
+      "ko": "그들은 새 정책에 대해 반대의 의견을 가졌습니다.",
+      "word": "contrary"
+    },
+    {
+      "sentence": "Not a single person arrived on time for the meeting.",
+      "ko": "회의에 제시간에 도착한 사람이 단 한 명도 없었습니다.",
+      "word": "single"
+    },
+    {
+      "sentence": "He is single and lives with his two cats.",
+      "ko": "그는 독신이며 그의 고양이 두 마리와 함께 삽니다.",
+      "word": "single"
+    },
+    {
+      "sentence": "The children walked on the beach with bare feet.",
+      "ko": "아이들은 맨발로 해변을 걸었습니다.",
+      "word": "bare"
+    },
+    {
+      "sentence": "We only have the bare necessities for the camping trip.",
+      "ko": "우리는 캠핑 여행을 위한 가장 기본적인 필수품만 가지고 있습니다.",
+      "word": "bare"
+    },
+    {
+      "sentence": "One dollar is equal to about 1,300 won.",
+      "ko": "1달러는 약 1,300원과 동일합니다.",
+      "word": "equal"
+    },
+    {
+      "sentence": "The law ensures that everyone has equal rights.",
+      "ko": "그 법은 모든 사람이 평등한 권리를 갖도록 보장합니다.",
+      "word": "equal"
+    },
+    {
+      "sentence": "In playing chess, he has no equal in this school.",
+      "ko": "체스를 두는 데 있어, 이 학교에 그와 대등한 사람은 없습니다.",
+      "word": "equal"
+    },
+    {
+      "sentence": "Two plus two equals four.",
+      "ko": "2 더하기 2는 4와 같습니다.",
+      "word": "equals"
+    },
+    {
+      "sentence": "The old man has very conservative views on education.",
+      "ko": "그 노인은 교육에 대해 매우 보수적인 견해를 가지고 있습니다.",
+      "word": "conservative"
+    },
+    {
+      "sentence": "This is a classic example of Renaissance architecture.",
+      "ko": "이것은 르네상스 건축의 일류의(최고의) 예시입니다.",
+      "word": "classic"
+    },
+    {
+      "sentence": "She made a classic mistake on the math test.",
+      "ko": "그녀는 수학 시험에서 전형적인 실수를 저질렀습니다.",
+      "word": "classic"
+    },
+    {
+      "sentence": "He likes to wear a classic navy blue suit.",
+      "ko": "그는 고전적인 남색 정장을 입는 것을 좋아합니다.",
+      "word": "classic"
+    },
+    {
+      "sentence": "The novel '1984' is considered a modern classic.",
+      "ko": "소설 '1984'는 현대의 고전(명작)으로 간주됩니다.",
+      "word": "classic"
+    },
+    {
+      "sentence": "The car's design is a classic of the 1960s.",
+      "ko": "그 차의 디자인은 1960년대의 전형적인 것입니다.",
+      "word": "classic"
+    },
+    {
+      "sentence": "It was a typical rainy afternoon in London.",
+      "ko": "런던의 전형적인 비 오는 오후였습니다.",
+      "word": "typical"
+    },
+    {
+      "sentence": "Each person has a unique set of fingerprints.",
+      "ko": "사람마다 독특한(유일무이한) 지문 세트를 가지고 있습니다.",
+      "word": "unique"
+    },
+    {
+      "sentence": "The species is unique to this tropical island.",
+      "ko": "그 종은 이 열대 섬 고유의 것입니다.",
+      "word": "unique"
+    },
+    {
+      "sentence": "Is there a particular reason why you are late?",
+      "ko": "당신이 늦은 어떤 특정한 이유가 있나요?",
+      "word": "particular"
+    },
+    {
+      "sentence": "She paid particular attention to the details.",
+      "ko": "그녀는 세부 사항에 특별한(각별한) 주의를 기울였습니다.",
+      "word": "particular"
+    }
+  ]
+};
+
+    let currentSet = []; let idx = 0; let results = []; let studentName = "";
+
+    function shuffle(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+
+    window.onload = function() {
+        studentName = window.prompt("학생 이름을 입력하세요.", "");
+        if (!studentName || !studentName.trim()) {
+            document.querySelector('.container').innerHTML = '<h1>시험이 취소되었습니다. 새로고침 후 다시 시도하세요.</h1>';
+            return;
+        }
+        studentName = studentName.trim();
+        
+        const unitKey = Object.keys(quizData)[0];
+        if (!unitKey || !quizData[unitKey] || quizData[unitKey].length === 0) {
+            document.querySelector('.container').innerHTML = '<h1>퀴즈 데이터를 불러올 수 없습니다.</h1>';
+            return;
+        }
+
+        let allQuestions = quizData[unitKey];
+        currentSet = shuffle([...allQuestions]).slice(0, 40);
+        
+        if (currentSet.length === 0) {
+            document.querySelector('.container').innerHTML = '<h1>문제가 없습니다.</h1>';
+            return;
+        }
+        
+        idx = 0;
+        results = [];
+        document.getElementById('quiz-screen').classList.add('active');
+        document.getElementById('unit-name').textContent = unitKey;
+        showQ();
+    };
+
+    function showQ() {
+        if (idx >= currentSet.length) {
+            showResult();
+            return;
+        }
+        const q = currentSet[idx];
+        const blank = q.word[0] + "_".repeat(q.word.length - 1);
+        const regex = new RegExp("\\b" + q.word + "\\b", "gi");
+        document.getElementById('en-text').innerHTML = q.sentence.replace(regex, `<span class="blank">${blank}</span>`);
+        document.getElementById('ko-text').textContent = q.ko;
+        document.getElementById('progress').textContent = (idx + 1) + " / " + currentSet.length;
+        document.getElementById('user-input').value = "";
+        document.getElementById('user-input').focus();
+    }
+
+    function handleNext() {
+        const userAns = document.getElementById('user-input').value.trim().toLowerCase();
+        if (!userAns) return; // 빈칸 제출 방지
+        const correctAns = currentSet[idx].word.toLowerCase();
+        results.push({ q: currentSet[idx], user: userAns, isCorrect: userAns === correctAns });
+        idx++;
+        if (idx < currentSet.length) {
+            showQ();
+        } else {
+            showResult();
+        }
+    }
+    
+    document.getElementById('user-input').addEventListener('keydown', function(event) {
+        if (event.key === 'Enter') {
+            handleNext();
+        }
+    });
+
+    function showResult() {
+        document.getElementById('quiz-screen').classList.remove('active');
+        document.getElementById('result-screen').classList.add('active');
+        const correctCount = results.filter(r => r.isCorrect).length;
+        document.getElementById('res-student').textContent = studentName + " 학생";
+        document.getElementById('final-score').textContent = `총 ${results.length}문제 중 ${correctCount}문제 정답`;
+        
+        const listHtml = results.filter(r => !r.isCorrect).map(r => `
+            <div class="wrong-item">
+                <div style="margin-bottom:5px;">${r.q.sentence.replace(new RegExp(r.q.word, 'gi'), `<b style="color:red">${r.q.word}</b>`)}</div>
+                <div style="font-size:12px; color:blue;">정답: <b class="correct-ans">${r.q.word}</b> | 입력: <b class="wrong-ans">${r.user || '미입력'}</b></div>
+            </div>
+        `).join('');
+        document.getElementById('wrong-list').innerHTML = listHtml || "<div style='padding:20px; color:var(--success-green); font-weight:bold;'>만점입니다!</div>";
+    }
+
+    function downloadResult() {
+        const correctCount = results.filter(r => r.isCorrect).length;
+        const unitName = document.getElementById('unit-name').textContent;
+        let content = `학생명 : ${studentName}\n유닛명 : ${unitName}\n점  수 : ${results.length} 중 ${correctCount}\n\n[오답 기록]\n`;
+        results.filter(r => !r.isCorrect).forEach((r, i) => {
+            content += `${i+1}. 정답: ${r.q.word}, 내 입력: ${r.user}\n   문장: ${r.q.sentence}\n\n`;
+        });
+        const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+        a.download = `결과_${studentName}_${unitName}.txt`;
+        a.click();
+    }
+</script>
+</body>
+</html>
