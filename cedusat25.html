@@ -1,0 +1,243 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>cedusat25</title>
+    <link href="https://cdn.jsdelivr.net/gh/sun-typeface/SUIT/fonts/variable/woff2/SUIT-Variable.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #3b82f6; --primary-dark: #2563eb; --secondary-color: #64748b; --secondary-dark: #475569;
+            --correct-color: #16a34a; --incorrect-color: #dc2626; --bg-color: #f1f5f9; --card-bg: #ffffff;
+            --text-color: #1e293b; --subtle-text: #64748b;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'SUIT Variable', sans-serif; background-color: var(--bg-color); color: var(--text-color); display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 1rem; }
+        .quiz-wrapper { width: 100%; max-width: 600px; background-color: var(--card-bg); border-radius: 1.5rem; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); overflow: hidden; transition: all 0.3s ease; }
+        #start-screen, #quiz-container, #result-screen { padding: 2rem; display: flex; flex-direction: column; gap: 1.5rem; }
+        #start-screen h1, #result-screen h1 { text-align: center; font-size: 2rem; font-weight: 800; }
+        .form-group { display: flex; flex-direction: column; gap: 0.5rem; }
+        .form-group label { font-weight: 600; color: var(--subtle-text); }
+        #name-input, #answer-input { width: 100%; padding: 1rem; border: 2px solid #cbd5e1; border-radius: 0.75rem; font-size: 1.1rem; font-family: 'SUIT Variable', sans-serif; outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
+        #name-input:focus, #answer-input:focus { border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3); }
+        .quiz-header { display: flex; justify-content: space-between; align-items: center; font-weight: 600; color: var(--subtle-text); }
+        #timer { font-size: 1.1rem; font-weight: 700; transition: color 0.3s; }
+        #timer.low-time { color: var(--incorrect-color); }
+        .question-box { background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 1rem; padding: 1.5rem; min-height: 150px; display: flex; flex-direction: column; justify-content: center; }
+        .question-type { font-weight: 700; color: var(--primary-color); margin-bottom: 0.5rem; }
+        .question-word { font-size: 2.5rem; font-weight: 800; }
+        .question-meaning { font-size: 1.5rem; font-weight: 600; color: var(--primary-color); line-height: 1.6; }
+        .question-hint { margin-top: 0.75rem; color: var(--subtle-text); font-size: 0.9rem; }
+        .submit-btn { width: 100%; background-color: var(--primary-color); color: white; border: none; border-radius: 0.75rem; padding: 1rem; font-size: 1.1rem; font-weight: 700; cursor: pointer; transition: background-color 0.2s, transform 0.1s; }
+        .submit-btn:hover { background-color: var(--primary-dark); }
+        .submit-btn:active { transform: scale(0.98); }
+        .result-summary { background-color: #f8fafc; padding: 1rem; border-radius: 1rem; text-align: center; font-size: 1.25rem; }
+        .result-summary span { font-weight: 700; color: var(--primary-color); }
+        .result-table-container { max-height: 400px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 0.75rem; }
+        .results-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+        .results-table th, .results-table td { padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid #e2e8f0; }
+        .results-table thead { position: sticky; top: 0; background-color: #f1f5f9; }
+        .results-table th { font-weight: 600; }
+        .results-table tbody tr:last-child td { border-bottom: none; }
+        .results-table .status-O { color: var(--correct-color); font-weight: 700; }
+        .results-table .status-X { color: var(--incorrect-color); font-weight: 700; }
+        .results-table .col-question { font-weight: 600; max-width: 150px; overflow-wrap: break-word; }
+        .results-table .col-user-answer { color: #334155; }
+        .results-table .col-correct-answer { color: var(--subtle-text); }
+        .button-container { display: flex; flex-direction: column; gap: 1rem; }
+        @media (min-width: 600px) { .button-container { flex-direction: row; } .button-container .submit-btn { flex: 1; } }
+        .secondary-btn { background-color: var(--secondary-color); }
+        .secondary-btn:hover { background-color: var(--secondary-dark); }
+        .fade-in { animation: fadeIn 0.5s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+    <div class="quiz-wrapper">
+        <div id="start-screen">
+            <h1>영어 단어 시험</h1>
+            <div class="form-group">
+                <label for="name-input">이름</label>
+                <input type="text" id="name-input" placeholder="이름을 입력하세요">
+            </div>
+            <button id="start-btn" class="submit-btn">시험 시작</button>
+        </div>
+        <div id="quiz-container" style="display: none;">
+            <header class="quiz-header">
+                <div id="progress"></div>
+                <div id="timer">30초</div>
+            </header>
+            <div id="question-box" class="question-box"></div>
+            <input type="text" id="answer-input" placeholder="답안을 입력하고 Enter를 누르세요" autocomplete="off">
+            <button id="submit-btn" class="submit-btn">제출하고 다음 문제</button>
+        </div>
+        <div id="result-screen" style="display: none;">
+            <h1 id="result-title">시험 결과</h1>
+            <div class="result-summary">총 <span id="total-questions">0</span>문제 중 <span id="correct-count">0</span>개 맞춤</div>
+            <div class="result-table-container">
+                <table class="results-table">
+                    <thead><tr><th>번호</th><th>문제</th><th>나의 답</th><th>정답</th><th>결과</th></tr></thead>
+                    <tbody id="results-tbody"></tbody>
+                </table>
+            </div>
+            <div class="button-container">
+                 <button id="save-btn" class="submit-btn secondary-btn">결과 HTML로 저장</button>
+                 <button id="restart-btn" class="submit-btn">새로운 시험 시작</button>
+            </div>
+        </div>
+    </div>
+    
+    <script id="vocabulary-data" type="application/json">[{"word":"organism","meanings":[["유기체","(작은) 생물"]]},{"word":"microbe","meanings":[["미생물"]]},{"word":"germ","meanings":[["세균","병균"]]},{"word":"cell","meanings":[["1. 세포 2. (수도원","교도소 등의) 작은 방"],["독방 3. 전지"]]},{"word":"tissue","meanings":[["1. (세포들로 이뤄진) 조직 2. 화장지"],["얇은 종이[천]"]]},{"word":"mammal","meanings":[["포유동물"]]},{"word":"primate","meanings":[["영장류"]]},{"word":"reptile","meanings":[["파충류"]]},{"word":"wildlife","meanings":[["야생동물"]]},{"word":"vegetation","meanings":[["(특정 지역의) 초목","식물"]]},{"word":"botanic(al)","meanings":[["식물의"],["식물학(상)의"]]},{"word":"stem","meanings":[["1. (식물의) 줄기","대 2. 어간"],["생기다","유래하다"]]},{"word":"predator","meanings":[["포식자","포식 동물"],["약탈자"]]},{"word":"prey","meanings":[["1. (동물의) 먹이","사냥감 2. 희생자","피해자"]]},{"word":"parasite","meanings":[["기생 동물[식물]","기생충"]]},{"word":"breed","meanings":[["1. 새끼를 낳다 2. 사육하다","재배하다 3. 야기하다","일으키다"],["품종"]]},{"word":"spawn","meanings":[["1. (개구리 등이) 알을 낳다 2. (결과","상황 등을) 낳다"],["(개구리 등의) 알 덩어리"]]},{"word":"hatch","meanings":[["(알을) 깨다","부화하다"],["(배","항공기의) 출입문[구]"]]},{"word":"sting","meanings":[["1. (가시","침 등으로) 찌르다","쏘다 2. 따끔거리다","쓰리다"]]},{"word":"burrow","meanings":[["1. (굴을) 파다 2. (~속으로) 파고들다","파묻다"],["굴"]]},{"word":"flock","meanings":[["떼","무리"],["(많은 수가) 모이다","떼 지어 가다[오다]"]]},{"word":"pollination","meanings":[["수분"]]},{"word":"sprout","meanings":[["싹"],["싹이 나다"]]},{"word":"bloom","meanings":[["꽃이 피다"],["1. (관상용) 꽃 2. 한창(때)","전성기"]]},{"word":"wither","meanings":[["1. 시들다","말라 죽다 2. 약해지다"],["사라져 가다"]]},{"word":"ferment","meanings":[["발효되다","발효시키다"],["발효(균)"],["효소"]]},{"word":"dormant","meanings":[["(동식물이) 발육을 중단한","휴면기의"],["동면중의"]]},{"word":"hibernation","meanings":[["겨울잠","동면"]]},{"word":"aquatic","meanings":[["1. 물속[물가]에서 자라는 2. 물과 관련된"]]},{"word":"nocturnal","meanings":[["야행성의"]]},{"word":"adaptation","meanings":[["1. 적응 2. 각색"]]},{"word":"tame","meanings":[["(짐승 등을) 길들이다"],["길들여진"]]},{"word":"gene","meanings":[["유전자"]]},{"word":"heredity","meanings":[["유전"],["유전적 특징"]]},{"word":"species","meanings":[["(분류상의) 종"]]},{"word":"hybrid","meanings":[["1. (동식물의) 잡종 2. 혼성체","혼합물"]]},{"word":"evolve","meanings":[["1. 진화하다 2. (점진적으로) 발전하다"]]},{"word":"mutate","meanings":[["1. 돌연변이가 되다 2. 변화하다"]]},{"word":"measure","meanings":[["1. 측정하다","재다2. 척도","기준3. 평가하다","판단하다 4. 조치","대책"]]},{"word":"trunk","meanings":[["1. (나무) 줄기2. (사람의) 몸통3. (코끼리의) 코4. 여행용 큰 가방5. (자동차의) 트렁크"]]}]</script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const vocabularyData = JSON.parse(document.getElementById('vocabulary-data').textContent);
+            
+            const startScreen = document.getElementById('start-screen');
+            const quizContainer = document.getElementById('quiz-container');
+            const resultScreen = document.getElementById('result-screen');
+            const nameInput = document.getElementById('name-input');
+            const startBtn = document.getElementById('start-btn');
+            const progressEl = document.getElementById('progress');
+            const timerEl = document.getElementById('timer');
+            const questionBox = document.getElementById('question-box');
+            const answerInput = document.getElementById('answer-input');
+            const submitBtn = document.getElementById('submit-btn');
+            const resultTitle = document.getElementById('result-title');
+            const totalQuestionsEl = document.getElementById('total-questions');
+            const correctCountEl = document.getElementById('correct-count');
+            const resultsTbody = document.getElementById('results-tbody');
+            const restartBtn = document.getElementById('restart-btn');
+            const saveBtn = document.getElementById('save-btn');
+
+            let quizSet = [], currentIndex = 0, results = [], timerInterval, userName = '';
+            const TIME_LIMIT = 30;
+
+            function escapeForHtml(unsafe) { 
+                if (typeof unsafe !== 'string') return '';
+                return unsafe.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;"); 
+            }
+
+            function generateHint(meanings) {
+                const counts = { '동사': 0, '명사': 0, '형용사': 0, '기타': 0 };
+                meanings.forEach(group => {
+                    const m = group[0];
+                    if (['하다', '되다', '다', '기다', '지다'].some(s => m.endsWith(s))) counts['동사']++;
+                    else if (['적인', '한', '운'].some(s => m.endsWith(s))) counts['형용사']++;
+                    else if (!/다$/.test(m) && !/운$/.test(m) && !/한$/.test(m) && !/적인$/.test(m)) counts['명사']++;
+                    else counts['기타']++;
+                });
+                return Object.entries(counts).filter(([, c]) => c > 0).map(([p, c]) => `${p}의미 ${c}개`).join(', ');
+            }
+
+            function init() {
+                quizContainer.style.display = 'none';
+                resultScreen.style.display = 'none';
+                startScreen.style.display = 'flex';
+                startScreen.classList.add('fade-in');
+            }
+
+            function handleStartQuiz() {
+                userName = nameInput.value.trim() || '사용자';
+                if (vocabularyData.length === 0) { alert('어휘 리스트가 비어있습니다.'); return; }
+                startQuiz(vocabularyData);
+            }
+
+            function startQuiz(vocabulary) {
+                currentIndex = 0; results = [];
+                const shuffled = [...vocabulary].sort(() => 0.5 - Math.random());
+                const half = Math.ceil(shuffled.length / 2);
+                const spelling = shuffled.slice(0, half).map(w => ({ ...w, type: '철자 쓰기' }));
+                const meaning = shuffled.slice(half).map(w => ({ ...w, type: '뜻 쓰기' }));
+                quizSet = [...spelling, ...meaning].sort(() => 0.5 - Math.random());
+                startScreen.style.display = 'none';
+                quizContainer.style.display = 'flex';
+                displayQuestion();
+            }
+
+            function displayQuestion() {
+                if (currentIndex >= quizSet.length) { showResults(); return; }
+                const q = quizSet[currentIndex];
+                progressEl.textContent = `문제 ${currentIndex + 1}/${quizSet.length}`;
+                answerInput.value = '';
+                questionBox.innerHTML = '';
+                if (q.type === '철자 쓰기') {
+                    questionBox.innerHTML = `<div class="question-type">[철자 쓰기]</div><div class="question-meaning">${q.meanings.map(g => g.join(', ')).join('; ')}</div><div class="question-hint">${generateHint(q.meanings)}</div>`;
+                    answerInput.value = q.word.charAt(0);
+                } else {
+                    questionBox.innerHTML = `<div class="question-type">[뜻 쓰기]</div><div class="question-word">${q.word}</div><div class="question-hint">${generateHint(q.meanings)}</div>`;
+                }
+                answerInput.focus();
+                startTimer();
+            }
+
+            function startTimer() {
+                clearInterval(timerInterval);
+                let timeLeft = TIME_LIMIT;
+                timerEl.textContent = `${timeLeft}초`;
+                timerEl.classList.remove('low-time');
+                timerInterval = setInterval(() => {
+                    timeLeft--;
+                    timerEl.textContent = `${timeLeft}초`;
+                    if (timeLeft <= 5) timerEl.classList.add('low-time');
+                    if (timeLeft <= 0) { clearInterval(timerInterval); submitAnswer(); }
+                }, 1000);
+            }
+
+            function submitAnswer() {
+                clearInterval(timerInterval);
+                const q = quizSet[currentIndex];
+                const userAnswer = answerInput.value.trim();
+                let isCorrect = false, correctAnswerText = '';
+                if (q.type === '철자 쓰기') {
+                    correctAnswerText = q.word;
+                    isCorrect = userAnswer.toLowerCase() === q.word.toLowerCase();
+                } else {
+                    correctAnswerText = q.meanings.map(g => `[${g.join('/')}]`).join(' ');
+                    isCorrect = q.meanings.every(g => g.some(s => userAnswer.includes(s)));
+                }
+                results.push({ q, userAnswer: userAnswer || '(미입력)', isCorrect, correctAnswerText });
+                currentIndex++;
+                displayQuestion();
+            }
+
+            function showResults() {
+                quizContainer.style.display = 'none';
+                resultScreen.style.display = 'flex';
+                let correctCount = results.filter(r => r.isCorrect).length;
+                resultTitle.textContent = `${userName}님의 시험 결과`;
+                totalQuestionsEl.textContent = quizSet.length;
+                correctCountEl.textContent = correctCount;
+                resultsTbody.innerHTML = results.map((r, i) => {
+                    const qText = r.q.type === '철자 쓰기' ? r.q.meanings.map(g=>g.join(', ')).join('; ') : r.q.word;
+                    return `<tr><td>${i + 1}</td><td class="col-question">${escapeForHtml(qText)}</td><td>${escapeForHtml(r.userAnswer)}</td><td>${escapeForHtml(r.correctAnswerText)}</td><td class="${r.isCorrect ? 'status-O' : 'status-X'}">${r.isCorrect ? 'O' : 'X'}</td></tr>`;
+                }).join('');
+            }
+            
+            function handleSaveResults() {
+                const date = new Date().toISOString().slice(0, 10);
+                const filename = `${userName}_시험_결과_${date}.html`;
+                let tableContent = results.map((r, i) => {
+                    const qText = r.q.type === '철자 쓰기' ? r.q.meanings.map(g=>g.join(', ')).join('; ') : r.q.word;
+                    return `<tr><td>${i + 1}</td><td>${escapeForHtml(qText)}</td><td>${escapeForHtml(r.userAnswer)}</td><td>${escapeForHtml(r.correctAnswerText)}</td><td class="${r.isCorrect ? 'status-O' : 'status-X'}">${r.isCorrect ? 'O' : 'X'}</td></tr>`;
+                }).join('');
+                const html = `<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><title>${escapeForHtml(userName)}님의 시험 결과</title><style>body{font-family:sans-serif;margin:2rem;}h1,h2{text-align:center;}table{width:100%;border-collapse:collapse;margin-top:1rem;}th,td{padding:0.75rem;text-align:left;border:1px solid #e2e8f0;}th{background-color:#f1f5f9;}.status-O{color:#16a34a;font-weight:bold;}.status-X{color:#dc2626;font-weight:bold;}</style></head><body><h1>${escapeForHtml(userName)}님의 시험 결과</h1><h2>총 ${quizSet.length}문제 중 ${results.filter(r => r.isCorrect).length}개 맞춤</h2><table><thead><tr><th>번호</th><th>문제</th><th>나의 답</th><th>정답</th><th>결과</th></tr></thead><tbody>${tableContent}</tbody></table></body></html>`;
+                const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+                const link = document.createElement("a");
+                link.href = URL.createObjectURL(blob);
+                link.download = filename;
+                link.click();
+                URL.revokeObjectURL(link.href);
+            }
+
+            startBtn.addEventListener('click', handleStartQuiz);
+            submitBtn.addEventListener('click', submitAnswer);
+            answerInput.addEventListener('keydown', e => { if (e.key === 'Enter') submitAnswer(); });
+            restartBtn.addEventListener('click', init);
+            saveBtn.addEventListener('click', handleSaveResults);
+            init();
+        });
+    </script>
+</body>
+</html>
