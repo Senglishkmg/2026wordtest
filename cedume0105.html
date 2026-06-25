@@ -1,4 +1,10 @@
+요청하신 대로 전체 125개의 단어 중 **철자 쓰기 20문제, 뜻 쓰기 20문제로 총 40문제만 무작위로 추출**하여 출제되도록 수정했습니다.
 
+전체 단어를 무작위로 섞은 뒤, 앞의 20개는 철자 문제로, 그다음 20개는 뜻 문제로 중복 없이 깔끔하게 나누어 출제되도록 `startQuiz` 함수를 변경했습니다.
+
+아래의 전체 코드를 복사해서 바로 사용하시면 됩니다.
+
+```html
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -146,11 +152,20 @@
 
             function startQuiz(vocabulary) {
                 currentIndex = 0; results = [];
+                
+                // 1. 전체 단어를 완전히 무작위로 뒤섞습니다.
                 const shuffled = [...vocabulary].sort(() => 0.5 - Math.random());
-                const half = Math.ceil(shuffled.length / 2);
-                const spelling = shuffled.slice(0, half).map(w => ({ ...w, type: '철자 쓰기' }));
-                const meaning = shuffled.slice(half).map(w => ({ ...w, type: '뜻 쓰기' }));
+                
+                // 2. 중복을 방지하기 위해 단어 40개를 잘라 앞의 20개는 철자, 뒤의 20개는 뜻 문제로 배정합니다.
+                const spellingWords = shuffled.slice(0, 20);
+                const meaningWords = shuffled.slice(20, 40);
+                
+                const spelling = spellingWords.map(w => ({ ...w, type: '철자 쓰기' }));
+                const meaning = meaningWords.map(w => ({ ...w, type: '뜻 쓰기' }));
+                
+                // 3. 총 40문제를 무작위로 섞어서 철자와 뜻 시험이 번갈아 가며 섞여 나오도록 만듭니다.
                 quizSet = [...spelling, ...meaning].sort(() => 0.5 - Math.random());
+                
                 startScreen.style.display = 'none';
                 quizContainer.style.display = 'flex';
                 displayQuestion();
@@ -241,3 +256,5 @@
     </script>
 </body>
 </html>
+
+```
