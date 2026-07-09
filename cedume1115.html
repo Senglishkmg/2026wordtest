@@ -1,0 +1,243 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>cedume1115</title>
+    <link href="https://cdn.jsdelivr.net/gh/sun-typeface/SUIT/fonts/variable/woff2/SUIT-Variable.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #3b82f6; --primary-dark: #2563eb; --secondary-color: #64748b; --secondary-dark: #475569;
+            --correct-color: #16a34a; --incorrect-color: #dc2626; --bg-color: #f1f5f9; --card-bg: #ffffff;
+            --text-color: #1e293b; --subtle-text: #64748b;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'SUIT Variable', sans-serif; background-color: var(--bg-color); color: var(--text-color); display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 1rem; }
+        .quiz-wrapper { width: 100%; max-width: 600px; background-color: var(--card-bg); border-radius: 1.5rem; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); overflow: hidden; transition: all 0.3s ease; }
+        #start-screen, #quiz-container, #result-screen { padding: 2rem; display: flex; flex-direction: column; gap: 1.5rem; }
+        #start-screen h1, #result-screen h1 { text-align: center; font-size: 2rem; font-weight: 800; }
+        .form-group { display: flex; flex-direction: column; gap: 0.5rem; }
+        .form-group label { font-weight: 600; color: var(--subtle-text); }
+        #name-input, #answer-input { width: 100%; padding: 1rem; border: 2px solid #cbd5e1; border-radius: 0.75rem; font-size: 1.1rem; font-family: 'SUIT Variable', sans-serif; outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
+        #name-input:focus, #answer-input:focus { border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3); }
+        .quiz-header { display: flex; justify-content: space-between; align-items: center; font-weight: 600; color: var(--subtle-text); }
+        #timer { font-size: 1.1rem; font-weight: 700; transition: color 0.3s; }
+        #timer.low-time { color: var(--incorrect-color); }
+        .question-box { background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 1rem; padding: 1.5rem; min-height: 150px; display: flex; flex-direction: column; justify-content: center; }
+        .question-type { font-weight: 700; color: var(--primary-color); margin-bottom: 0.5rem; }
+        .question-word { font-size: 2.5rem; font-weight: 800; }
+        .question-meaning { font-size: 1.5rem; font-weight: 600; color: var(--primary-color); line-height: 1.6; }
+        .question-hint { margin-top: 0.75rem; color: var(--subtle-text); font-size: 0.9rem; }
+        .submit-btn { width: 100%; background-color: var(--primary-color); color: white; border: none; border-radius: 0.75rem; padding: 1rem; font-size: 1.1rem; font-weight: 700; cursor: pointer; transition: background-color 0.2s, transform 0.1s; }
+        .submit-btn:hover { background-color: var(--primary-dark); }
+        .submit-btn:active { transform: scale(0.98); }
+        .result-summary { background-color: #f8fafc; padding: 1rem; border-radius: 1rem; text-align: center; font-size: 1.25rem; }
+        .result-summary span { font-weight: 700; color: var(--primary-color); }
+        .result-table-container { max-height: 400px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 0.75rem; }
+        .results-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+        .results-table th, .results-table td { padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid #e2e8f0; }
+        .results-table thead { position: sticky; top: 0; background-color: #f1f5f9; }
+        .results-table th { font-weight: 600; }
+        .results-table tbody tr:last-child td { border-bottom: none; }
+        .results-table .status-O { color: var(--correct-color); font-weight: 700; }
+        .results-table .status-X { color: var(--incorrect-color); font-weight: 700; }
+        .results-table .col-question { font-weight: 600; max-width: 150px; overflow-wrap: break-word; }
+        .results-table .col-user-answer { color: #334155; }
+        .results-table .col-correct-answer { color: var(--subtle-text); }
+        .button-container { display: flex; flex-direction: column; gap: 1rem; }
+        @media (min-width: 600px) { .button-container { flex-direction: row; } .button-container .submit-btn { flex: 1; } }
+        .secondary-btn { background-color: var(--secondary-color); }
+        .secondary-btn:hover { background-color: var(--secondary-dark); }
+        .fade-in { animation: fadeIn 0.5s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+    <div class="quiz-wrapper">
+        <div id="start-screen">
+            <h1>영어 단어 시험</h1>
+            <div class="form-group">
+                <label for="name-input">이름</label>
+                <input type="text" id="name-input" placeholder="이름을 입력하세요">
+            </div>
+            <button id="start-btn" class="submit-btn">시험 시작</button>
+        </div>
+        <div id="quiz-container" style="display: none;">
+            <header class="quiz-header">
+                <div id="progress"></div>
+                <div id="timer">30초</div>
+            </header>
+            <div id="question-box" class="question-box"></div>
+            <input type="text" id="answer-input" placeholder="답안을 입력하고 Enter를 누르세요" autocomplete="off">
+            <button id="submit-btn" class="submit-btn">제출하고 다음 문제</button>
+        </div>
+        <div id="result-screen" style="display: none;">
+            <h1 id="result-title">시험 결과</h1>
+            <div class="result-summary">총 <span id="total-questions">0</span>문제 중 <span id="correct-count">0</span>개 맞춤</div>
+            <div class="result-table-container">
+                <table class="results-table">
+                    <thead><tr><th>번호</th><th>문제</th><th>나의 답</th><th>정답</th><th>결과</th></tr></thead>
+                    <tbody id="results-tbody"></tbody>
+                </table>
+            </div>
+            <div class="button-container">
+                 <button id="save-btn" class="submit-btn secondary-btn">결과 HTML로 저장</button>
+                 <button id="restart-btn" class="submit-btn">새로운 시험 시작</button>
+            </div>
+        </div>
+    </div>
+    
+    <script id="vocabulary-data" type="application/json">[{"word":"college","meanings":[["[명] 대학(교)"]]},{"word":"university","meanings":[["[명] 대학교"]]},{"word":"class","meanings":[["[명] 1. 학급","반 2. 수업 3. 계급"]]},{"word":"classroom","meanings":[["[명] 교실"]]},{"word":"homeroom","meanings":[["[명] 홈룸 (교실) ((학생들이 출석 등을 위해 모이는 교실))"]]},{"word":"grade","meanings":[["[명] 1. 학년 2. 성적 3. 등급"]]},{"word":"teenage","meanings":[["[형] 십 대의"]]},{"word":"vacation","meanings":[["[명] 1. 방학 2. 휴가"]]},{"word":"graduate","meanings":[["[동] 졸업하다"]]},{"word":"smart","meanings":[["[형] 1. 똑똑한","영리한 2. 단정한","멋진"]]},{"word":"ready","meanings":[["[형] 준비가 된"]]},{"word":"textbook","meanings":[["[명] 교과서"]]},{"word":"dictionary","meanings":[["[명] 사전"]]},{"word":"blackboard","meanings":[["[명] 칠판"]]},{"word":"glue","meanings":[["[명] 접착제","풀 [동] (접착제로) 붙이다"]]},{"word":"uniform","meanings":[["[명] 1. 유니폼","제복 2. 교복"]]},{"word":"schoolwork","meanings":[["[명] 학업","학교 공부"]]},{"word":"lesson","meanings":[["[명] 1. 수업 2. 과 3. 교훈"]]},{"word":"learn","meanings":[["[동] 배우다","학습하다"]]},{"word":"major","meanings":[["[명] 전공 [형] 주요한"]]},{"word":"fact","meanings":[["[명] 사실"]]},{"word":"title","meanings":[["[명] 제목","표제"]]},{"word":"example","meanings":[["[명] 예","보기"]]},{"word":"basis","meanings":[["[명] 근거","이유"]]},{"word":"word","meanings":[["[명] 단어","낱말"]]},{"word":"math","meanings":[["[명] 수학"]]},{"word":"science","meanings":[["[명] 과학"]]},{"word":"history","meanings":[["[명] 역사"]]},{"word":"grammar","meanings":[["[명] 문법"]]},{"word":"teach","meanings":[["[동] 가르치다"]]},{"word":"explain","meanings":[["[동] 설명하다"]]},{"word":"note","meanings":[["[명] 1. 메모","필기 2. 편지","쪽지"]]},{"word":"keep","meanings":[["[동] 1. (상태를) 유지하다 2. ~을 계속하다 3. 보유하다"]]},{"word":"finish","meanings":[["[동] 끝나다","마치다 [명] 마지막 부분","끝"]]},{"word":"bring","meanings":[["[동] 가져오다","데려오다"]]},{"word":"test","meanings":[["[명] 시험","테스트 [동] 시험하다"]]},{"word":"quiz","meanings":[["[명] 퀴즈","(간단한) 시험"]]},{"word":"level","meanings":[["[명] 1. 수준","단계 2. 높이"]]},{"word":"problem","meanings":[["[명] 문제"]]},{"word":"puzzle","meanings":[["[명] 1. 퍼즐 2. 수수께끼"]]},{"word":"question","meanings":[["[명] 질문","의문 [동] 질문하다"]]},{"word":"answer","meanings":[["[명] 답","대답 [동] 대답하다"]]},{"word":"write","meanings":[["[동] 쓰다","작성하다"]]},{"word":"mark","meanings":[["[동] 1. 표시하다 2. 채점하다 [명] 1. 표시 2. 자국","흔적"]]},{"word":"check","meanings":[["[동] 1. 살피다","점검하다 2. 확인하다 [명] 확인","점검"]]},{"word":"fail","meanings":[["[동] 1. 실패하다 2. (시험에) 떨어지다"]]},{"word":"mistake","meanings":[["[명] 실수","잘못"]]},{"word":"playground","meanings":[["[명] 운동장","놀이터"]]},{"word":"contest","meanings":[["[명] 대회","경연"]]},{"word":"award","meanings":[["[명] 상"]]},{"word":"classmate","meanings":[["[명] 급우","반 친구"]]},{"word":"friendship","meanings":[["[명] 우정"]]},{"word":"relationship","meanings":[["[명] 관계","사이"]]},{"word":"group","meanings":[["[명] 무리","집단","그룹"]]},{"word":"member","meanings":[["[명] 구성원","회원"]]},{"word":"manner","meanings":[["[명] 1. 태도 2. (-s) 예의 3. 방법","방식"]]},{"word":"dear","meanings":[["[형] 사랑하는","소중한"]]},{"word":"favor","meanings":[["[명] 호의","친절"]]},{"word":"helpful","meanings":[["[형] 도움이 되는"]]},{"word":"together","meanings":[["[부] 함께","같이"]]},{"word":"gather","meanings":[["[동] 1. ~을 모으다 2. 모이다","집결하다"]]},{"word":"join","meanings":[["[동] 1. 가입하다","참여하다 2. 연결하다"]]},{"word":"visit","meanings":[["[동] 방문하다","찾아가다 [명] 방문"]]},{"word":"meet","meanings":[["[동] 만나다"]]},{"word":"call","meanings":[["[동] 1. ~라고 부르다 2. 전화하다"]]},{"word":"message","meanings":[["[명] 메시지"]]},{"word":"nickname","meanings":[["[명] 별명","애칭"]]},{"word":"trick","meanings":[["[명] 1. 속임수 2. 장난","농담"]]},{"word":"promise","meanings":[["[동] 약속하다 [명] 약속"]]},{"word":"secret","meanings":[["[명] 비밀 [형] 비밀의"]]},{"word":"fight","meanings":[["[동] 싸우다 [명] 싸움"]]},{"word":"apologize","meanings":[["[동] 사과하다"]]},{"word":"forgive","meanings":[["[동] 용서하다"]]},{"word":"hug","meanings":[["[동] 껴안다","포옹하다"]]},{"word":"post","meanings":[["[명] 우편","우편물 [동] 우편물을 발송하다"]]},{"word":"opinion","meanings":[["[명] 의견"]]},{"word":"idea","meanings":[["[명] 생각","아이디어"]]},{"word":"point","meanings":[["[명] 1. 의견","주장 2. 요점 [동] 가리키다"]]},{"word":"consider","meanings":[["[동] 1. 고려하다","숙고하다 2. ~로 여기다"]]},{"word":"decide","meanings":[["[동] 결정하다"]]},{"word":"guess","meanings":[["[동] 추측하다 [명] 추측"]]},{"word":"focus","meanings":[["[동] 1. 집중하다 2. 초점을 맞추다 [명] 초점"]]},{"word":"doubt","meanings":[["[명] 의심","의문 [동] 의심하다"]]},{"word":"wonder","meanings":[["[동] 1. 궁금하다 2. 크게 놀라다 [명] 감탄","경이(감)"]]},{"word":"imagine","meanings":[["[동] 상상하다"]]},{"word":"prefer","meanings":[["[동] 선호하다"]]},{"word":"concern","meanings":[["[명] 1. 걱정","우려 2. 관심사 [동] 1. ~에 관계가 있다 2. ~을 걱정시키다"]]},{"word":"notice","meanings":[["[명] 1. 주목","알아챔 2. 공고문","안내문 [동] 알아차리다","~을 의식하다"]]},{"word":"familiar","meanings":[["[형] 익숙한","친숙한"]]},{"word":"understand","meanings":[["[동] 이해하다","알다"]]},{"word":"memory","meanings":[["[명] 기억","기억력"]]},{"word":"remember","meanings":[["[동] 기억하다","기억나다"]]},{"word":"forget","meanings":[["[동] 잊다","잊어버리다"]]},{"word":"mind","meanings":[["[명] 1. 마음","정신 2. 지성 [동] 언짢아하다","상관하다"]]},{"word":"mental","meanings":[["[형] 정신의","마음의"]]},{"word":"attract","meanings":[["[동] 끌어들이다[끌어모으다]"]]},{"word":"believe","meanings":[["[동] 믿다"]]},{"word":"expect","meanings":[["[동] 예상하다","기대하다"]]},{"word":"hope","meanings":[["[동] 희망하다","바라다 [명] 희망"]]},{"word":"wish","meanings":[["[명] 소망","바람 [동] 바라다"]]},{"word":"sport(s)","meanings":[["[명] 스포츠","운동"]]},{"word":"soccer","meanings":[["[명] 축구"]]},{"word":"football","meanings":[["[명] 축구","미식축구"]]},{"word":"basketball","meanings":[["[명] 농구"]]},{"word":"race","meanings":[["[명] 1. 경주","(달리기) 시합 2. 인종","종족"]]},{"word":"player","meanings":[["[명] 1. 선수 2. 재생 장치"]]},{"word":"athlete","meanings":[["[명] (운동)선수"]]},{"word":"practice","meanings":[["[명] 1. 연습 2. 실행","실천 [동] 연습하다"]]},{"word":"sweat","meanings":[["[명] 땀 [동] 땀을 흘리다"]]},{"word":"strength","meanings":[["[명] 1. 힘","기운 2. 강점"]]},{"word":"health","meanings":[["[명] 건강","건강 상태"]]},{"word":"participate","meanings":[["[동] 참가하다","참여하다"]]},{"word":"compete","meanings":[["[동] 경쟁하다"]]},{"word":"kick","meanings":[["[동] (발로) 차다"]]},{"word":"strike","meanings":[["[동] 1. (세게) 치다 2. (공 등을) 치다","차다"]]},{"word":"throw","meanings":[["[동] 던지다"]]},{"word":"whistle","meanings":[["[명] 1. 호루라기 2. 휘파람 [동] 휘파람을 불다"]]},{"word":"score","meanings":[["[명] 1. 득점 2. 점수 [동] 득점하다"]]},{"word":"goal","meanings":[["[명] 1. 골문 2. 골","득점 3. 목표"]]},{"word":"cheer","meanings":[["[명] 환호(성) [동] 1. 환호하다","환호성을 지르다 2. 응원하다"]]},{"word":"win","meanings":[["[동] 이기다"]]},{"word":"beat","meanings":[["[동] 1. (게임·시합에서) 이기다 2. 때리다"]]},{"word":"victory","meanings":[["[명] 승리"]]},{"word":"prize","meanings":[["[명] 상","상품"]]},{"word":"lose","meanings":[["[동] 1. 잃어버리다 2. 지다","패하다"]]}]</script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const vocabularyData = JSON.parse(document.getElementById('vocabulary-data').textContent);
+            
+            const startScreen = document.getElementById('start-screen');
+            const quizContainer = document.getElementById('quiz-container');
+            const resultScreen = document.getElementById('result-screen');
+            const nameInput = document.getElementById('name-input');
+            const startBtn = document.getElementById('start-btn');
+            const progressEl = document.getElementById('progress');
+            const timerEl = document.getElementById('timer');
+            const questionBox = document.getElementById('question-box');
+            const answerInput = document.getElementById('answer-input');
+            const submitBtn = document.getElementById('submit-btn');
+            const resultTitle = document.getElementById('result-title');
+            const totalQuestionsEl = document.getElementById('total-questions');
+            const correctCountEl = document.getElementById('correct-count');
+            const resultsTbody = document.getElementById('results-tbody');
+            const restartBtn = document.getElementById('restart-btn');
+            const saveBtn = document.getElementById('save-btn');
+
+            let quizSet = [], currentIndex = 0, results = [], timerInterval, userName = '';
+            const TIME_LIMIT = 30;
+
+            function escapeForHtml(unsafe) { 
+                if (typeof unsafe !== 'string') return '';
+                return unsafe.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;"); 
+            }
+
+            function generateHint(meanings) {
+                const counts = { '동사': 0, '명사': 0, '형용사': 0, '기타': 0 };
+                meanings.forEach(group => {
+                    const m = group[0];
+                    if (['하다', '되다', '다', '기다', '지다'].some(s => m.endsWith(s))) counts['동사']++;
+                    else if (['적인', '한', '운'].some(s => m.endsWith(s))) counts['형용사']++;
+                    else if (!/다$/.test(m) && !/운$/.test(m) && !/한$/.test(m) && !/적인$/.test(m)) counts['명사']++;
+                    else counts['기타']++;
+                });
+                return Object.entries(counts).filter(([, c]) => c > 0).map(([p, c]) => `${p}의미 ${c}개`).join(', ');
+            }
+
+            function init() {
+                quizContainer.style.display = 'none';
+                resultScreen.style.display = 'none';
+                startScreen.style.display = 'flex';
+                startScreen.classList.add('fade-in');
+            }
+
+            function handleStartQuiz() {
+                userName = nameInput.value.trim() || '사용자';
+                if (vocabularyData.length === 0) { alert('어휘 리스트가 비어있습니다.'); return; }
+                startQuiz(vocabularyData);
+            }
+
+            function startQuiz(vocabulary) {
+                currentIndex = 0; results = [];
+                const shuffled = [...vocabulary].sort(() => 0.5 - Math.random());
+                const half = Math.ceil(shuffled.length / 2);
+                const spelling = shuffled.slice(0, half).map(w => ({ ...w, type: '철자 쓰기' }));
+                const meaning = shuffled.slice(half).map(w => ({ ...w, type: '뜻 쓰기' }));
+                quizSet = [...spelling, ...meaning].sort(() => 0.5 - Math.random());
+                startScreen.style.display = 'none';
+                quizContainer.style.display = 'flex';
+                displayQuestion();
+            }
+
+            function displayQuestion() {
+                if (currentIndex >= quizSet.length) { showResults(); return; }
+                const q = quizSet[currentIndex];
+                progressEl.textContent = `문제 ${currentIndex + 1}/${quizSet.length}`;
+                answerInput.value = '';
+                questionBox.innerHTML = '';
+                if (q.type === '철자 쓰기') {
+                    questionBox.innerHTML = `<div class="question-type">[철자 쓰기]</div><div class="question-meaning">${q.meanings.map(g => g.join(', ')).join('; ')}</div>`;
+                    answerInput.value = q.word.charAt(0);
+                } else {
+                    questionBox.innerHTML = `<div class="question-type">[뜻 쓰기]</div><div class="question-word">${q.word}</div>`;
+                }
+                answerInput.focus();
+                startTimer();
+            }
+
+            function startTimer() {
+                clearInterval(timerInterval);
+                let timeLeft = TIME_LIMIT;
+                timerEl.textContent = `${timeLeft}초`;
+                timerEl.classList.remove('low-time');
+                timerInterval = setInterval(() => {
+                    timeLeft--;
+                    timerEl.textContent = `${timeLeft}초`;
+                    if (timeLeft <= 5) timerEl.classList.add('low-time');
+                    if (timeLeft <= 0) { clearInterval(timerInterval); submitAnswer(); }
+                }, 1000);
+            }
+
+            function submitAnswer() {
+                clearInterval(timerInterval);
+                const q = quizSet[currentIndex];
+                const userAnswer = answerInput.value.trim();
+                let isCorrect = false, correctAnswerText = '';
+                if (q.type === '철자 쓰기') {
+                    correctAnswerText = q.word;
+                    isCorrect = userAnswer.toLowerCase() === q.word.toLowerCase();
+                } else {
+                    correctAnswerText = q.meanings.map(g => `[${g.join('/')}]`).join(' ');
+                    isCorrect = q.meanings.every(g => g.some(s => userAnswer.includes(s)));
+                }
+                results.push({ q, userAnswer: userAnswer || '(미입력)', isCorrect, correctAnswerText });
+                currentIndex++;
+                displayQuestion();
+            }
+
+            function showResults() {
+                quizContainer.style.display = 'none';
+                resultScreen.style.display = 'flex';
+                let correctCount = results.filter(r => r.isCorrect).length;
+                resultTitle.textContent = `${userName}님의 시험 결과`;
+                totalQuestionsEl.textContent = quizSet.length;
+                correctCountEl.textContent = correctCount;
+                resultsTbody.innerHTML = results.map((r, i) => {
+                    const qText = r.q.type === '철자 쓰기' ? r.q.meanings.map(g=>g.join(', ')).join('; ') : r.q.word;
+                    return `<tr><td>${i + 1}</td><td class="col-question">${escapeForHtml(qText)}</td><td>${escapeForHtml(r.userAnswer)}</td><td>${escapeForHtml(r.correctAnswerText)}</td><td class="${r.isCorrect ? 'status-O' : 'status-X'}">${r.isCorrect ? 'O' : 'X'}</td></tr>`;
+                }).join('');
+            }
+            
+            function handleSaveResults() {
+                const date = new Date().toISOString().slice(0, 10);
+                const filename = `${userName}_시험_결과_${date}.html`;
+                let tableContent = results.map((r, i) => {
+                    const qText = r.q.type === '철자 쓰기' ? r.q.meanings.map(g=>g.join(', ')).join('; ') : r.q.word;
+                    return `<tr><td>${i + 1}</td><td>${escapeForHtml(qText)}</td><td>${escapeForHtml(r.userAnswer)}</td><td>${escapeForHtml(r.correctAnswerText)}</td><td class="${r.isCorrect ? 'status-O' : 'status-X'}">${r.isCorrect ? 'O' : 'X'}</td></tr>`;
+                }).join('');
+                const html = `<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><title>${escapeForHtml(userName)}님의 시험 결과</title><style>body{font-family:sans-serif;margin:2rem;}h1,h2{text-align:center;}table{width:100%;border-collapse:collapse;margin-top:1rem;}th,td{padding:0.75rem;text-align:left;border:1px solid #e2e8f0;}th{background-color:#f1f5f9;}.status-O{color:#16a34a;font-weight:bold;}.status-X{color:#dc2626;font-weight:bold;}</style></head><body><h1>${escapeForHtml(userName)}님의 시험 결과</h1><h2>총 ${quizSet.length}문제 중 ${results.filter(r => r.isCorrect).length}개 맞춤</h2><table><thead><tr><th>번호</th><th>문제</th><th>나의 답</th><th>정답</th><th>결과</th></tr></thead><tbody>${tableContent}</tbody></table></body></html>`;
+                const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+                const link = document.createElement("a");
+                link.href = URL.createObjectURL(blob);
+                link.download = filename;
+                link.click();
+                URL.revokeObjectURL(link.href);
+            }
+
+            startBtn.addEventListener('click', handleStartQuiz);
+            submitBtn.addEventListener('click', submitAnswer);
+            answerInput.addEventListener('keydown', e => { if (e.key === 'Enter') submitAnswer(); });
+            restartBtn.addEventListener('click', init);
+            saveBtn.addEventListener('click', handleSaveResults);
+            init();
+        });
+    </script>
+</body>
+</html>
