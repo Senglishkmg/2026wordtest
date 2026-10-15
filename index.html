@@ -20,49 +20,64 @@
         
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             
-            <div class="space-y-4 bg-green-50/50 p-5 rounded-xl border border-green-100">
-                <h2 class="text-lg font-bold text-green-700 border-b-2 border-green-200 pb-2 mb-4">중등 시리즈</h2>
-                <div class="flex flex-col gap-2">
-                    <p class="text-xs font-bold text-green-600 ml-1">중학 필수</p>
-                    <div class="grid grid-cols-2 gap-2 mb-2">
-                        <a href="cedume.html" class="bg-white text-green-700 py-2 rounded-lg border border-green-200 hover:bg-green-100 text-center text-sm shadow-sm font-semibold">단어형</a>
-                        <a href="cedumest.html" class="bg-white text-green-600 py-2 rounded-lg border border-dashed border-green-200 hover:bg-green-50 text-center text-sm shadow-sm">문장제</a>
-                    </div>
-                    
-                    <p class="text-xs font-bold text-emerald-600 ml-1">중학 마스터</p>
-                    <div class="grid grid-cols-2 gap-2">
-                        <a href="cedumm.html" class="bg-white text-emerald-700 py-2 rounded-lg border border-emerald-200 hover:bg-emerald-100 text-center text-sm shadow-sm font-semibold">단어형</a>
-                        <a href="cedummst.html" class="bg-white text-emerald-600 py-2 rounded-lg border border-dashed border-emerald-200 hover:bg-emerald-50 text-center text-sm shadow-sm">문장제</a>
-                    </div>
-                </div>
-            </div>
-
-            <div class="space-y-4 bg-blue-50/50 p-5 rounded-xl border border-blue-100">
-                <h2 class="text-lg font-bold text-blue-700 border-b-2 border-blue-200 pb-2 mb-4">고등/수능 시리즈</h2>
-                <div class="flex flex-col gap-2">
-                    <p class="text-xs font-bold text-sky-600 ml-1">고교 기본</p>
-                    <div class="grid grid-cols-2 gap-2 mb-2">
-                        <a href="ceduhb.html" class="bg-white text-sky-700 py-2 rounded-lg border border-sky-200 hover:bg-sky-100 text-center text-sm shadow-sm font-semibold">단어형</a>
-                        <a href="ceduhbst.html" class="bg-white text-sky-600 py-2 rounded-lg border border-dashed border-sky-200 hover:bg-sky-50 text-center text-sm shadow-sm">문장제</a>
-                    </div>
-
-                    <p class="text-xs font-bold text-blue-600 ml-1">어휘끝 수능</p>
-                    <div class="grid grid-cols-2 gap-2">
-                        <a href="cedusat.html" class="bg-white text-blue-700 py-2 rounded-lg border border-blue-200 hover:bg-blue-100 text-center text-sm shadow-sm font-semibold">단어형</a>
-                        <a href="cedusatst.html" class="bg-white text-blue-600 py-2 rounded-lg border border-dashed border-blue-200 hover:bg-blue-50 text-center text-sm shadow-sm">문장제</a>
+            <!-- 중등 시리즈 카드 -->
+            <div class="space-y-4 bg-green-50/50 p-5 rounded-xl border border-green-100 flex flex-col justify-between">
+                <div>
+                    <h2 class="text-lg font-bold text-green-700 border-b-2 border-green-200 pb-2 mb-4">중등 시리즈</h2>
+                    <div class="flex flex-col gap-2">
+                        <p class="text-xs font-bold text-green-600 ml-1">중학 필수</p>
+                        <div class="grid grid-cols-2 gap-2 mb-2">
+                            <a href="cedume.html" class="bg-white text-green-700 py-2 rounded-lg border border-green-200 hover:bg-green-100 text-center text-sm shadow-sm font-semibold transition-colors">단어형</a>
+                            <a href="cedumest.html" class="bg-white text-green-600 py-2 rounded-lg border border-dashed border-green-200 hover:bg-green-50 text-center text-sm shadow-sm transition-colors">문장제</a>
+                        </div>
+                        
+                        <!-- 중학 마스터 자리에 배치된 어휘끝 고난이도 -->
+                        <p class="text-xs font-bold text-emerald-600 ml-1">어휘끝 고난이도</p>
+                        <div class="grid grid-cols-2 gap-2">
+                            <a href="cedumhd.html" class="bg-white text-emerald-700 py-2 rounded-lg border border-emerald-200 hover:bg-emerald-100 text-center text-sm shadow-sm font-semibold transition-colors">단어형</a>
+                            <a href="cedumhdst.html" class="bg-white text-emerald-600 py-2 rounded-lg border border-dashed border-emerald-200 hover:bg-emerald-50 text-center text-sm shadow-sm transition-colors">문장제</a>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div class="space-y-4 bg-purple-50/50 p-5 rounded-xl border border-purple-100">
-                <h2 class="text-lg font-bold text-purple-700 border-b-2 border-purple-200 pb-2 mb-4">심화 시리즈</h2>
-                <div class="flex flex-col gap-2">
-                    <p class="text-xs font-bold text-purple-600 ml-1">어휘끝 고난이도</p>
-                    <div class="grid grid-cols-1 gap-2">
-                        <a href="cedumhd.html" class="bg-white text-purple-700 py-3 rounded-lg border border-purple-200 hover:bg-purple-100 text-center text-sm shadow-sm font-semibold">어휘끝 고난이도</a>
-                        <a href="cedumhdst.html" class="bg-white text-purple-600 py-2 rounded-lg border border-dashed border-purple-200 hover:bg-purple-50 text-center text-sm shadow-sm">고난이도 (문장제)</a>
+            <!-- 고등/수능 시리즈 카드 -->
+            <div class="space-y-4 bg-blue-50/50 p-5 rounded-xl border border-blue-100 flex flex-col justify-between">
+                <div>
+                    <h2 class="text-lg font-bold text-blue-700 border-b-2 border-blue-200 pb-2 mb-4">고등/수능 시리즈</h2>
+                    <div class="flex flex-col gap-2">
+                        <p class="text-xs font-bold text-sky-600 ml-1">고교 기본</p>
+                        <div class="grid grid-cols-2 gap-2 mb-2">
+                            <a href="ceduhb.html" class="bg-white text-sky-700 py-2 rounded-lg border border-sky-200 hover:bg-sky-100 text-center text-sm shadow-sm font-semibold transition-colors">단어형</a>
+                            <a href="ceduhbst.html" class="bg-white text-sky-600 py-2 rounded-lg border border-dashed border-sky-200 hover:bg-sky-50 text-center text-sm shadow-sm transition-colors">문장제</a>
+                        </div>
+
+                        <p class="text-xs font-bold text-blue-600 ml-1">어휘끝 수능</p>
+                        <div class="grid grid-cols-2 gap-2">
+                            <a href="cedusat.html" class="bg-white text-blue-700 py-2 rounded-lg border border-blue-200 hover:bg-blue-100 text-center text-sm shadow-sm font-semibold transition-colors">단어형</a>
+                            <a href="cedusatst.html" class="bg-white text-blue-600 py-2 rounded-lg border border-dashed border-blue-200 hover:bg-blue-50 text-center text-sm shadow-sm transition-colors">문장제</a>
+                        </div>
                     </div>
                 </div>
+            </div>
+
+            <!-- 수업교재별 어휘 카드 (신규) -->
+            <div class="space-y-4 bg-purple-50/50 p-5 rounded-xl border border-purple-100 flex flex-col justify-between">
+                <div>
+                    <h2 class="text-lg font-bold text-purple-700 border-b-2 border-purple-200 pb-2 mb-4">수업교재 어휘</h2>
+                    <div class="flex flex-col gap-2">
+                        <p class="text-xs font-bold text-purple-600 ml-1">수업 교재별 단어 학습</p>
+                        <div class="grid grid-cols-1 gap-2 pt-1">
+                            <a href="cs.html" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3.5 px-4 rounded-xl shadow-md text-center text-sm flex items-center justify-center gap-2 transition-all">
+                                <span>수업교재별 어휘 바로가기</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <p class="text-xs text-purple-500 text-center">정규 수업 전용 단어 목록으로 이동합니다.</p>
             </div>
 
         </div>
